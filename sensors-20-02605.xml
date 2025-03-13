@@ -1,0 +1,1721 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE article PUBLIC "-//NLM//DTD JATS (Z39.96) Journal Publishing DTD v1.1 20151215//EN" "JATS-journalpublishing1.dtd">
+<article xmlns:mml="http://www.w3.org/1998/Math/MathML" xmlns:xlink="http://www.w3.org/1999/xlink" article-type="research-article" dtd-version="1.1" xml:lang="en">
+  <front>
+    <journal-meta>
+      <journal-id journal-id-type="publisher-id">sensors</journal-id>
+      <journal-title-group>
+        <journal-title>Sensors</journal-title>
+        <abbrev-journal-title abbrev-type="publisher">Sensors</abbrev-journal-title>
+        <abbrev-journal-title abbrev-type="pubmed">Sensors</abbrev-journal-title>
+      </journal-title-group>
+      <issn pub-type="epub">1424-8220</issn>
+      <publisher>
+        <publisher-name>MDPI</publisher-name>
+      </publisher>
+    </journal-meta>
+    <article-meta>
+      <article-id pub-id-type="doi">10.3390/s20092605</article-id>
+      <article-id pub-id-type="publisher-id">sensors-20-02605</article-id>
+      <article-categories>
+        <subj-group>
+          <subject>Article</subject>
+        </subj-group>
+      </article-categories>
+      <title-group>
+        <article-title>Parkinson&#x2019;s Disease EMG Data Augmentation and Simulation with DCGANs and Style Transfer</article-title>
+      </title-group>
+      <contrib-group>
+        <contrib contrib-type="author">
+          <contrib-id contrib-id-type="orcid" authenticated="true">https://orcid.org/0000-0002-8981-6844</contrib-id>
+          <name>
+            <surname>Anicet Zanini</surname>
+            <given-names>Rafael</given-names>
+          </name>
+          <xref rid="c1-sensors-20-02605" ref-type="corresp">*</xref>
+        </contrib>
+        <contrib contrib-type="author">
+          <contrib-id contrib-id-type="orcid" authenticated="true">https://orcid.org/0000-0003-0467-3133</contrib-id>
+          <name>
+            <surname>Luna Colombini</surname>
+            <given-names>Esther</given-names>
+          </name>
+        </contrib>
+      </contrib-group>
+      <aff id="af1-sensors-20-02605">Laboratory of Robotics and Cognitive Science (LaRoCS), Universidade Estadual de Campinas (UNICAMP), Campinas SP 13083-852, Brazil; <email>esther@ic.unicamp.br</email></aff>
+      <author-notes>
+        <corresp id="c1-sensors-20-02605"><label>*</label>Correspondence: <email>rzanini@gmail.com</email></corresp>
+      </author-notes>
+      <pub-date pub-type="epub">
+        <day>03</day>
+        <month>05</month>
+        <year>2020</year>
+      </pub-date>
+      <pub-date pub-type="collection">
+        <month>05</month>
+        <year>2020</year>
+      </pub-date>
+      <volume>20</volume>
+      <issue>9</issue>
+      <elocation-id>2605</elocation-id>
+      <history>
+        <date date-type="received">
+          <day>30</day>
+          <month>03</month>
+          <year>2020</year>
+        </date>
+        <date date-type="accepted">
+          <day>28</day>
+          <month>04</month>
+          <year>2020</year>
+        </date>
+      </history>
+      <permissions>
+        <copyright-statement>&#xA9; 2020 by the authors.</copyright-statement>
+        <copyright-year>2020</copyright-year>
+        <license license-type="open-access">
+          <license-p>Licensee MDPI, Basel, Switzerland. This article is an open access article distributed under the terms and conditions of the Creative Commons Attribution (CC BY) license (<ext-link ext-link-type="uri" xlink:href="http://creativecommons.org/licenses/by/4.0/">http://creativecommons.org/licenses/by/4.0/</ext-link>).</license-p>
+        </license>
+      </permissions>
+      <abstract>
+        <p>This paper proposes two new data augmentation approaches based on Deep Convolutional Generative Adversarial Networks (DCGANs) and Style Transfer for augmenting Parkinson&#x2019;s Disease (PD) electromyography (EMG) signals. The experimental results indicate that the proposed models can adapt to different frequencies and amplitudes of tremor, simulating each patient&#x2019;s tremor patterns and extending them to different sets of movement protocols. Therefore, one could use these models for extending the existing patient dataset and generating tremor simulations for validating treatment approaches on different movement scenarios.</p>
+      </abstract>
+      <kwd-group>
+        <kwd>Parkinson&#x2019;s disease</kwd>
+        <kwd>sEMG</kwd>
+        <kwd>DCGAN</kwd>
+        <kwd>style transfer</kwd>
+        <kwd>signal processing</kwd>
+      </kwd-group>
+    </article-meta>
+  </front>
+  <body>
+    <sec sec-type="intro" id="sec1-sensors-20-02605">
+      <title>1. Introduction</title>
+      <p>As one of the most common neurodegenerative diseases that affects approximately 10 million people around the world [<xref ref-type="bibr" rid="B1-sensors-20-02605">1</xref>], Parkinson&#x2019;s Disease (PD) has been studied and investigated from different manners and perspectives, in order to minimize the disease&#x2019;s symptoms and impairments to patients.</p>
+      <p>Many studies around rest and action tremors have been conducted, whereas surface electromyography (sEMG) stands out as one of the most common ways to measure muscle response to voluntary or involuntary stimulation, being widely used as main input and feedback signal for artificial stimulation devices [<xref ref-type="bibr" rid="B2-sensors-20-02605">2</xref>,<xref ref-type="bibr" rid="B3-sensors-20-02605">3</xref>,<xref ref-type="bibr" rid="B4-sensors-20-02605">4</xref>]. EMG is widely used clinically for the diagnosis of neurological and muscular pathology [<xref ref-type="bibr" rid="B5-sensors-20-02605">5</xref>], and has recently been used for several human&#x2013;machine interface applications, such as controlling computer interfaces, navigation through virtual reality environments, controlling robots, drones, and other interesting applications [<xref ref-type="bibr" rid="B6-sensors-20-02605">6</xref>].</p>
+      <p>However, acquiring such datasets from patients is a complicated and sometimes painful task. Most patients that experience unpleasant effects during such experiments, such as tiredness, fatigue [<xref ref-type="bibr" rid="B7-sensors-20-02605">7</xref>], and a wide range of movements, are usually not possible due to the patient&#x2019;s movement limitation and impairment due to the disease.</p>
+      <p>Therefore, collecting, processing, and using recorded EMG signals for analysis is quite a challenging approach, due to data scarcity and lack of dataset variation. Data augmentation is a promising alternative approach for extending existing datasets, which could allow further research and analysis.</p>
+      <p>In this work, we propose two new data augmentation approaches based on Deep Convolutional Generative Adversarial Networks (DCGANs) and Style Transfer for augmenting Parkinson&#x2019;s disease electromyography (EMG) signals with the use of two distinct EMG databases. To the best of our knowledge, this work proposes the first methods for EMG augmentation based on real patient data.</p>
+    </sec>
+    <sec id="sec2-sensors-20-02605">
+      <title>2. Related Work</title>
+      <p>Biological signal simulation can be used for many applications. However, generating realistic models requires a profound understanding of the simulated signal patterns and morphology [<xref ref-type="bibr" rid="B2-sensors-20-02605">2</xref>]. Since PD&#x2019;s tremor pattern is caused by a pathology with different intensity and manner for each patient, it is quite challenging to create such a generic mathematical model that can effectively produce an artificial signal similar to the real one.</p>
+      <p>Hamilton-Wright has presented a Physiologically Based Simulation for needle EMG [<xref ref-type="bibr" rid="B8-sensors-20-02605">8</xref>], which simulates how individual motor units (MUs) are triggered, and how the relationships are between quantitative features of EMG signals and muscle structure and activation. Ahad [<xref ref-type="bibr" rid="B5-sensors-20-02605">5</xref>] has successfully simulated EMG signals, considering different parameters that affect motor unit triggers, such as Muscle excitation, recruitment range, firing rate, and other parameters. However, his work simulates the effect of a simple contraction force on a specific muscle (tibialis anterior), for which all the required parameters have been studied and are well known. It does not simulate different movements of the muscle or the effect of a repetitive pattern, such as those combining contractions and relaxations existing on an involuntary tremor pattern.</p>
+      <p>Guerrero et al. [<xref ref-type="bibr" rid="B9-sensors-20-02605">9</xref>] propose a complete mathematical package implemented in R for pre-processing and simulating EMG signals. Their simulation method is based on a simple heteroscedastic model-based approach, which generates a generic EMG signal. However, the EMG it created based on specific parameters such as EMG base frequency, signal length, active window size, signal mean value, standard deviation, sampling rate, and a custom shape factor. This method requires that the simulated signal is deeply understood, must be very regular, and always follows the same pattern. Such an approach cannot adapt to different movement protocols or adapt to an individual&#x2019;s specific EMG tremor pattern, whose parameters are not known a priori, and present typical irregularities on frequencies and shape through time. Such adaptability is desired when trying to augment a specific patient dataset, instead of generating generic tremor patterns.</p>
+      <p>Previous work from the authors [<xref ref-type="bibr" rid="B10-sensors-20-02605">10</xref>] has shown that it is possible to use EMG signals using neural networks to predict tremor patterns in advance. This method could enable real-time assisting devices, like Functional Electrical Stimulation (FES) devices, to operate with much more precise control over the stimulus and the patient&#x2019;s tremor. However, this previous work focused on predicting a specific tremor pattern in time but did not provide a generic tremor simulator based on EMG signals. In addition, the adopted metric (RMSE), used to compare the prediction with the real signal, cannot be used when trying to generate a synthetic signal, since the shape and amplitudes might vary on time, despite keeping the signal main frequency components.</p>
+      <p>In this work, we propose two new approaches to generate surface EMG signals based on existing datasets. In our first proposed method, Neural Networks are trained to learn the specific EMG signal tremor patterns, hence being able to reproduce such tremor for each patient. The resulting model can also be employed as a feature extractor model, allowing us to further combine it with style transfer techniques for the second method. The resulting combination will enable us to generate a transformation model that simulates the tremor pattern not only on the original movement protocol but on other movements based on datasets from healthy individuals. Such extension allows us to use healthy patients datasets to investigate how PD can affect patients&#x2019; movements, on a much broader perspective than those that we can collect with real patients during measurement experiments.</p>
+    </sec>
+    <sec sec-type="materials" id="sec3-sensors-20-02605">
+      <title>3. Materials</title>
+      <sec id="sec3dot1-sensors-20-02605">
+        <title>3.1. Data Acquisition and Pre-Processing</title>
+        <p>This section describes in more detail the two EMG databases used for this work and pre-processing methods.</p>
+        <sec id="sec3dot1dot1-sensors-20-02605">
+          <title>3.1.1. Parkinson&#x2019;s Disease EMG Dataset</title>
+          <p>A private research dataset from real PD patients surface electromyography (sEMG) was obtained and used with permission from the authors from previous work [<xref ref-type="bibr" rid="B11-sensors-20-02605">11</xref>]. The dataset consists of 18 different record sets, each one with 116,000 data points (approximately 60 s), acquired from multiple sessions from five patients, one diagnosed with Essential Tremor (ET) and four diagnosed with PD according to UK Parkinson&#x2019;s Disease Society Brain Bank Clinical Diagnostic Criteria [<xref ref-type="bibr" rid="B12-sensors-20-02605">12</xref>]. All four PD patients have been diagnosed with primary PD, idiopathic usually by old age, and responsive to dopaminergic medication. All acquisition procedures were previously submitted and approved by the Plataforma Brasil ethical committee, and the patient selection was performed by neurologists from the Federal University of Sao Paulo (UNIFESP).</p>
+          <p>EMG signals were collected from wrist extensor and flexor muscles with a 2 kHz Delsys Trigno&#x2122;EMG system (DELSYS INCORPORATED, Natick, MA, USA). The data collection and pre-processing methods follow the same approach from previous work [<xref ref-type="bibr" rid="B11-sensors-20-02605">11</xref>]. Additionally, a 10-point moving average filter was applied to remove noise and high frequencies. All signals were re-scaled between &#x2013;1.0 and 1.0, and have been subtracted by the signal mean to have a standard scale between different experiments and samples. The left images in <xref ref-type="fig" rid="sensors-20-02605-f001">Figure 1</xref> show examples from the raw input data. The right images depict the signal after smoothing, and re-scaling processes are applied.</p>
+        </sec>
+        <sec id="sec3dot1dot2-sensors-20-02605">
+          <title>3.1.2. NinaPro Dataset</title>
+          <p>NinaPro is an open EMG database (<uri>http://ninapro.hevs.ch/</uri>) offering different kinds of EMG readings from different sets of patients. In this work, NinaPro database two (DB2) was used [<xref ref-type="bibr" rid="B13-sensors-20-02605">13</xref>], where data are collected from three exercises [<xref ref-type="bibr" rid="B14-sensors-20-02605">14</xref>]:<list list-type="order"><list-item><p>Basic movements of the fingers and the wrist</p></list-item><list-item><p>Grasping and functional movements</p></list-item><list-item><p>Force patterns</p></list-item></list></p>
+          <p>Since we are interested in using consistent EMG readings from the wrist of patients, we have selected the functional movement&#x2019;s experiments. We only used the readings from eight electrodes from a Delsys Trigno&#x2122;Wireless EMG system (DELSYS INCORPORATED, Natick, MA, USA) (<uri>www.delsys.com</uri>) that follows a similar acquisition system like the one employed in our private PD dataset, positioned around the forearm in correspondence to the radio humeral joint [<xref ref-type="bibr" rid="B14-sensors-20-02605">14</xref>]. The sEMG signals are also sampled at a rate of 2 kHz, which is consistent with the PD patient readings we have used before.</p>
+          <p>During the acquisition, the subjects were asked to repeat the movements with the right hand. Each movement repetition lasted five seconds and was followed by three seconds of rest. The protocol includes six repetitions of 49 different actions (plus rest) performed by 40 intact subjects [<xref ref-type="bibr" rid="B15-sensors-20-02605">15</xref>].</p>
+          <p>In this work, the data from the same type of exercises (wrist flexion or extension) were combined with the pause periods to create one segment per each stimulus. The signals were also re-scaled between &#x2013;1.0 and 1.0 and were subtracted by the mean. For this data, no moving average filter was applied, since we wanted to keep the original frequencies and characteristics of the content unchanged, to make sure it would be possible to compare the resulting signal to other existing models. <xref ref-type="fig" rid="sensors-20-02605-f002">Figure 2</xref> shows an example of such a signal for one individual performing a wrist extension. In this work, we have selected the first eight signals, since they are the ones connected to the Delsys Trigno wireless sensors and are similar to our PD EMG dataset.</p>
+        </sec>
+        <sec id="sec3dot1dot3-sensors-20-02605">
+          <title>3.1.3. Programming Language and Libraries</title>
+          <p>The main programming language used to implement the proposed models was Python 3. All existing implementations used for DCGAN and Style transfer were based on existing repositories written in Python. The main libraries used are open-source, available libraries:<list list-type="bullet"><list-item><p>Tensorflow: used as the main back-end for tensor calculation</p></list-item><list-item><p>Keras: used as an abstraction layer for creating NN models</p></list-item><list-item><p>Jupyter Notebook: used as main python IDE for structuring code and scripts</p></list-item><list-item><p>Pandas: used for the dataset and CSV processing</p></list-item><list-item><p>NumPy: a scientific computing library which provides an efficient matrix and array calculations</p></list-item><list-item><p>Matplotlib: a plotting library</p></list-item><list-item><p>distance: library for calculating DTW distance</p></list-item><list-item><p>fastdtw: library for calculating a faster implementation for DTW distance.</p></list-item></list></p>
+          <p>All proposed models and code are available on the following GitHub repository: <uri>https://github.com/larocs/EMG-GAN</uri>.</p>
+        </sec>
+        <sec id="sec3dot1dot4-sensors-20-02605">
+          <title>3.1.4. Computational Resources</title>
+          <p>For this work, most of the training and evaluation of models were done on an HP ZBook 15 G3 notebook (HP Inc., Palo Alto, CA, USA), with an Intel Core i7 processor (Intel Corporation, Santa Clara, CA, USA), 32 GB of random access memory (RAM), and an NVIDIA Quadro M2000M GPU (NVIDIA CORPORATE, Santa Clara, CA, USA) with 4 GB of RAM. When additional computational power was needed, ml.p3.2xlarge instances from AWS SageMaker Notebooks (Amazon Web Services, Inc., Seattle, WA, USA) were used, which are equipped with an NVIDIA Tesla V100 (NVIDIA CORPORATE, Santa Clara, CA, USA) instance with 16 GB RAM to speed up the training process.</p>
+        </sec>
+      </sec>
+    </sec>
+    <sec id="sec4-sensors-20-02605">
+      <title>4. Proposed Methods</title>
+      <p>This work proposed two methods for EMG data augmentation. On the first one, based on DCGANs, we train a generator that is capable of simulating each patient&#x2019;s EMG tremor pattern and its correlated discriminator. In the second, based on neural style transfer and the trained discriminator from the previous method, we apply the style from a PD patient on a set of healthy patient EMG signals, simulating the expected tremor behavior on a different set of movements. We can also use the same inputs to train a Fast Neural Style Transfer transformer network to use it as a fast transformation method. <xref ref-type="fig" rid="sensors-20-02605-f003">Figure 3</xref> presents a simplified diagram of the proposed methods.</p>
+      <sec id="sec4dot1-sensors-20-02605">
+        <title>4.1. EMG Signal Generation with DCGANs</title>
+        <p>Firstly introduced in 2014 [<xref ref-type="bibr" rid="B16-sensors-20-02605">16</xref>], a GAN is a machine learning architecture that consists basically of two networks: a generator and a discriminator. The generator produces data with the same dimensions as those of training data, based on some latent space given as input. The discriminator tries to distinguish the input that came from the training data from the generated data. Both networks are trained through common steps, while the generator gradually gains the ability to create data that are similar to the training data, the discriminator keeps trying to force the generator to improve by providing a better classification between fake and real data.</p>
+        <p>There have been many variations and enhancements to this architecture so far (as listed on [<xref ref-type="bibr" rid="B17-sensors-20-02605">17</xref>]) trying to optimize different aspects of such a model, like convergence, time to train, or the variety of generated samples. The DCGAN variation was introduced by [<xref ref-type="bibr" rid="B18-sensors-20-02605">18</xref>] as an extension of the GAN architecture, where deep convolutional neural networks are employed for both the generator and discriminator models. The authors also added some general recommendations for applying DCGANs, which is intended to create a faster and more stable convergence of both generator and discriminator models, such as:<list list-type="order"><list-item><p>Replacing pooling layers with stridden convolutions for the discriminator and fractional-strided convolutions for the generator.</p></list-item><list-item><p>Using batch norm in both the generator and the discriminator.</p></list-item><list-item><p>Removing fully connected hidden layers for deeper architectures.</p></list-item><list-item><p>Using ReLU activation in the generator for all layers except for the output, which uses tanh.</p></list-item><list-item><p>Using LeakyReLU activation in the discriminator for all layers.</p></list-item></list></p>
+        <p>Based on DCGAN architecture, further developments have been made allowing GANs to be widely utilized for producing multiple images, with current developments allowing the creation of amazing high-resolution images [<xref ref-type="bibr" rid="B19-sensors-20-02605">19</xref>].</p>
+        <p>However, despite their current success and results that focused on image generation, DCGANs have been less explored on time series and biological applications, where we shift to a multi-variable 1D context with intricate patterns varying through time. Yang et al. [<xref ref-type="bibr" rid="B20-sensors-20-02605">20</xref>] and Engel et al. [<xref ref-type="bibr" rid="B21-sensors-20-02605">21</xref>] present the usage of GANs for generating sound waves and music, while [<xref ref-type="bibr" rid="B22-sensors-20-02605">22</xref>] and [<xref ref-type="bibr" rid="B23-sensors-20-02605">23</xref>] present the usage of GANs for generating EEG and ECG signals, respectively. These works show the feasibility of using such architectures for bio-signal generation, using Wasserstein GAN (WGAN) architecture on [<xref ref-type="bibr" rid="B22-sensors-20-02605">22</xref>] and bidirectional long short-term memory (BiLSTM) networks on [<xref ref-type="bibr" rid="B23-sensors-20-02605">23</xref>]. Both works focused on also generating one single channel from the original signals, with a lower quantity of data points and complexity of patterns.</p>
+        <p>In this work, the DCGAN implementation available in [<xref ref-type="bibr" rid="B24-sensors-20-02605">24</xref>] was used as a baseline, and the generator and discriminator networks were extended to capture more relevant features from our EMG datasets. <xref ref-type="fig" rid="sensors-20-02605-f004">Figure 4</xref> shows the best architecture achieved for the proposed system. The resulting assessment was based on the proposed metrics defined in <xref ref-type="sec" rid="sec4dot3-sensors-20-02605">Section 4.3</xref> and on visual perception of the signal similarity. For every change in model parameters or architecture, models were re-trained from scratch with the same dataset to compare results.</p>
+        <p>Different architectures for the discriminator and generator were evaluated, including LSTM on both models. However, due to the complexity of the tremor signal and high length of the generated signal, those strategies took too long to train and have not achieved good results.</p>
+        <p>Typically, while creating GANs, the generator is of primary interest&#x2014;the discriminator is an adaptive loss function that gets discarded once the generator was trained. However, as we present in this paper, the trained discriminator can also be used as a feature extractor that can be applied in combination with other techniques, such as style transfer.</p>
+        <p>The generator is denoted as <italic>G</italic> (or <inline-formula><mml:math id="mm1" display="block"><mml:semantics><mml:msub><mml:mi>G</mml:mi><mml:mi>&#x3B8;</mml:mi></mml:msub></mml:semantics></mml:math></inline-formula> when considering the parameters), and the discriminator is expressed as <italic>D</italic> (or <inline-formula><mml:math id="mm2" display="block"><mml:semantics><mml:msub><mml:mi>D</mml:mi><mml:mi>r</mml:mi></mml:msub></mml:semantics></mml:math></inline-formula> when considering the parameters). A zero-sum game between the generator <italic>G</italic> and the discriminator <italic>D</italic> is performed incrementally, according to the original GAN idea to reach the Nash equilibrium point [<xref ref-type="bibr" rid="B16-sensors-20-02605">16</xref>]:<disp-formula id="FD1-sensors-20-02605"><label>(1)</label><mml:math id="mm3" display="block"><mml:semantics><mml:mrow><mml:munder><mml:mi>min</mml:mi><mml:mi>G</mml:mi></mml:munder><mml:munder><mml:mi>max</mml:mi><mml:mi>D</mml:mi></mml:munder><mml:mi>V</mml:mi><mml:mrow><mml:mo>(</mml:mo><mml:mi>D</mml:mi><mml:mo>,</mml:mo><mml:mi>G</mml:mi><mml:mo>)</mml:mo></mml:mrow><mml:mo>=</mml:mo><mml:msub><mml:mi mathvariant="double-struck">E</mml:mi><mml:mrow><mml:mi>x</mml:mi><mml:mo>&#x223C;</mml:mo><mml:msub><mml:mi>p</mml:mi><mml:mrow><mml:mi>d</mml:mi><mml:mi>a</mml:mi><mml:mi>t</mml:mi><mml:mi>a</mml:mi></mml:mrow></mml:msub><mml:mrow><mml:mo>(</mml:mo><mml:mi>x</mml:mi><mml:mo>)</mml:mo></mml:mrow></mml:mrow></mml:msub><mml:mfenced separators="" open="[" close="]"><mml:mi>l</mml:mi><mml:mi>o</mml:mi><mml:mi>g</mml:mi><mml:mi>D</mml:mi><mml:mo>(</mml:mo><mml:mi>x</mml:mi><mml:mo>)</mml:mo></mml:mfenced><mml:mo>+</mml:mo><mml:msub><mml:mi mathvariant="double-struck">E</mml:mi><mml:mrow><mml:mi>z</mml:mi><mml:mo>&#x223C;</mml:mo><mml:msub><mml:mi>p</mml:mi><mml:mi>z</mml:mi></mml:msub><mml:mrow><mml:mo>(</mml:mo><mml:mi>z</mml:mi><mml:mo>)</mml:mo></mml:mrow></mml:mrow></mml:msub><mml:mfenced separators="" open="[" close="]"><mml:mi>l</mml:mi><mml:mi>o</mml:mi><mml:mi>g</mml:mi><mml:mo>(</mml:mo><mml:mn>1</mml:mn><mml:mi>D</mml:mi><mml:mo>(</mml:mo><mml:mi>G</mml:mi><mml:mo>(</mml:mo><mml:mi>z</mml:mi><mml:mo>)</mml:mo><mml:mo>)</mml:mo><mml:mo>)</mml:mo></mml:mfenced></mml:mrow></mml:semantics></mml:math></disp-formula></p>
+        <sec id="sec4dot1dot1-sensors-20-02605">
+          <title>4.1.1. Generator Model</title>
+          <p>A typical DCGAN generator proposed by Radford et al. [<xref ref-type="bibr" rid="B18-sensors-20-02605">18</xref>] tries to generate 3-channel RGB images from a latent space <italic>z</italic>, given by a random sample of numbers with length <inline-formula><mml:math id="mm4" display="block"><mml:semantics><mml:mrow><mml:mi>n</mml:mi><mml:mi>z</mml:mi></mml:mrow></mml:semantics></mml:math></inline-formula>. The generator combines several up-sampling and 2D convolutional layers, finally generating a 3-channel RGB output with the same dimensions as the original training dataset.</p>
+          <p>Our best generator model consists of a deep convolution network that takes 400 point samples (0.2 s) from the original sample and tries to generate a new dataset with 2000 points (1 s). It includes on the end of the deep convolutional layers a moving average function that tries to smooth the generated signal so it can be compared to the filtered EMG input signal. We have evaluated several different parameters (such as the number of filters, layers, activation functions, and other settings) and reached a fine-tuned architecture according to the parameters shown in the experimental results. <xref ref-type="fig" rid="sensors-20-02605-f005">Figure 5</xref> presents our custom implementation, adapting the convolutional layers for 1D convolutions and including a dense layer and moving average at the end of the generator pipeline.</p>
+        </sec>
+        <sec id="sec4dot1dot2-sensors-20-02605">
+          <title>4.1.2. Discriminator Model</title>
+          <p>Our best discriminator model (<italic>D</italic>) consists of a deep convolution network that takes a batch of 100 randomly distributed samples with 2000 sequential points and tries to distinguish if they come from the training dataset or the generator. For such a task, we have combined parallel deep convolutional pipelines where each one generates extended features based on the input vectors. The pipeline combines four convolutional stacks, as presented in <xref ref-type="fig" rid="sensors-20-02605-f006">Figure 6</xref>:</p>
+          <sec>
+            <title>Convolutional Filters on Raw Signal</title>
+            <p>This pipeline applies four convolutional layers, each one consisting of a combination of the layers Conv1D + BatchNorm + ReLU + Dropout. The convolutional layers are applied to the raw EMG data to project the signal into 32 filters. The result is combined with other filters with a simple concatenation.</p>
+          </sec>
+          <sec>
+            <title>Convolutional Filters on FFT</title>
+            <p>The same convolutional pipeline is applied to the FFT of the raw signal, which is obtained with a custom lambda function on the input tensor. The pipeline provides a condensed representation of the frequency domain for the signal, highlighting the tremor frequencies typical for each patient.</p>
+          </sec>
+          <sec>
+            <title>Convolutional Filters on an EMG Envelope Signal</title>
+            <p>The same convolutional pipeline is applied to the EMG envelope, which is obtained by getting the absolute value of the EMG signal and using a moving average window with 100 points. The resulting EMG peaks are known as EMG envelopes and provide an easier detection of tremor peaks, as shown in <xref ref-type="fig" rid="sensors-20-02605-f007">Figure 7</xref>.</p>
+          </sec>
+          <sec>
+            <title>Convolutional Filters on Wavelet Expansion</title>
+            <p>The same convolutional pipeline is applied to a 2-level discrete wavelet transformation (DWT) of the signal, using the Daubechies wavelet db7 as wavelet mother. DWT uses a high-pass filter to obtain high-frequency components and a low-pass filter to capture low-frequency components. According to [<xref ref-type="bibr" rid="B25-sensors-20-02605">25</xref>], this family of wavelet functions can properly extract essential features from sEMG signals, which could be successfully used for movement classification.</p>
+          </sec>
+          <sec>
+            <title>Mini-Batch Discrimination</title>
+            <p>The concept of mini-batch discrimination was introduced by [<xref ref-type="bibr" rid="B26-sensors-20-02605">26</xref>] as a way to solve the issue with GANs and mode collapse. Mode collapse is when a generator learns how to generate a sample that fools the discriminator, but only for one particular case. The mini-batch discriminator adds a similarity function to the discriminator, so it can compare multiple instances of the generated data and make sure they differ from each other as a regular dataset would. This approach assures that the generator can generate multiple diverse examples that match the criteria from the discriminator. <xref ref-type="fig" rid="sensors-20-02605-f008">Figure 8</xref> depicts an example of a mini-batch discriminator model.</p>
+          </sec>
+        </sec>
+        <sec id="sec4dot1dot3-sensors-20-02605">
+          <title>4.1.3. Evaluated Architectures</title>
+          <p>All models were implemented with the Keras framework using Tensorflow, with a default Adam optimizer with a learning rate of 0.002 and a default training period over 5000 epochs. For improving generalization of the models, dropout layers were introduced between convolutional layers, and the results presented consider models trained for only one individual for the sake of comparison.</p>
+          <p>Different activation functions were also evaluated, and the best results were achieved with the given recommendation from [<xref ref-type="bibr" rid="B18-sensors-20-02605">18</xref>], using rectified linear units (ReLU) on generator hidden layers and LeakyReLU on all discriminator layers, and hyperbolic tangent (tanh) for the output layer from the generator.</p>
+          <p>For the DCGAN architecture, different architectures were evaluated for the generator and discriminator models. For this work, we highlight six different models, each one introducing an important improvement from the previous model:<list list-type="order"><list-item><p>3CNN-NOISE: this model uses the generator model as described in <xref ref-type="fig" rid="sensors-20-02605-f005">Figure 5</xref>, with the difference of not having the last moving average layer. It uses only three of the proposed convolution filters: the raw EMG, the FFT, and the envelope FFT. We have initially evaluated this model with a typical set of 100 random points as latent space (<italic>z</italic>). However, we recognized that, due to the randomness of the input data, it was challenging for the generator to create a consistent and smooth time series, with the input data varying so much.</p></list-item><list-item><p>3CNN: this model follows the exact same architecture as the previous model, with the distinction that it uses a 400 point sample from the reference signal. This increase in the latent space dimension (from 100 to 400) and the use of a coherent time-series signal allowed the resulting signal to be much smoother and closer to the reference signal. As we can see from the results in <xref ref-type="table" rid="sensors-20-02605-t001">Table 1</xref>, the DTW and FFT metrics are much closer to this model than the previous one, and the only difference is the latent space used for the generator.</p></list-item><list-item><p>WAVELET: this model uses the same generator from previous models and a 2-level wavelet decomposition as a feature for the convolutional filters on the discriminator. This model was created to evaluate the effectiveness of wavelet decomposition as a feature extractor for the EMG signal. Results show that even with just 2 level decomposition, the signal is quite close to the expected tremor pattern, and therefore we decided to include such feature on the next models.</p></list-item><list-item><p>4CNN: this model uses the same generator from previous models, and employs the four proposed feature pipelines. This model presented the best results. However, the generated samples are very similar to each other, indicating a case of mode collapse.</p></list-item><list-item><p>4CNN-MBD: this model uses the same generator from previous model (4CNN), but includes one additional pipeline for a mini-batch discriminator (MBD) block. We can see that the resulting signal is not as smooth as the previous one, but this model generates a whole batch of different signals that are quite similar to the real samples. For creating a multi-purpose generator, the possibility of generating a whole set of distinct samples is relevant. In this sense, this model is an improvement of the previous one, although the quality is not as good.</p></list-item><list-item><p>4CNN-MBD-MA: this model uses the same discriminator from the previous model (4CNN-MBD), with an additional layer of 10-point moving average (MA) at the end of the generator model. This small change enabled the model to avoid mode collapse (as we kept the mini-batch discriminator) and improved the generated samples&#x2019; quality, reducing their DTW distance and FFT MSE to the reference signals. This is the reference model (EMG-GAN) considered for further analysis.</p></list-item></list></p>
+        </sec>
+      </sec>
+      <sec id="sec4dot2-sensors-20-02605">
+        <title>4.2. EMG Generation Combining Two Signals with Style Transfer</title>
+        <p>Style Transfer (ST) was introduced in 2015 on the computer vision domain as a technique that allows us to recompose the content of an image in the style of another [<xref ref-type="bibr" rid="B27-sensors-20-02605">27</xref>]. It has been widely used for social apps that allow the addition or removal of facial features (like aging, beards, glasses, etc.), or stylize a picture according to a famous artist, such as VanGogh, DaVinci, or Kandinsky.</p>
+        <p>The neural style algorithm introduced in [<xref ref-type="bibr" rid="B27-sensors-20-02605">27</xref>] uses pre-trained models (VGG16) [<xref ref-type="bibr" rid="B28-sensors-20-02605">28</xref>] as feature extractors for images, using learned features to define the semantic loss terms (<inline-formula><mml:math id="mm5" display="block"><mml:semantics><mml:mrow><mml:msub><mml:mi>L</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>o</mml:mi><mml:mi>n</mml:mi><mml:mi>t</mml:mi></mml:mrow></mml:msub><mml:mrow><mml:mo>(</mml:mo><mml:mi>c</mml:mi><mml:mo>,</mml:mo><mml:mi>x</mml:mi><mml:mo>)</mml:mo></mml:mrow></mml:mrow></mml:semantics></mml:math></inline-formula> and <inline-formula><mml:math id="mm6" display="block"><mml:semantics><mml:mrow><mml:msub><mml:mi>L</mml:mi><mml:mrow><mml:mi>s</mml:mi><mml:mi>t</mml:mi><mml:mi>y</mml:mi></mml:mrow></mml:msub><mml:mrow><mml:mo>(</mml:mo><mml:mi>s</mml:mi><mml:mo>,</mml:mo><mml:mi>x</mml:mi><mml:mo>)</mml:mo></mml:mrow></mml:mrow></mml:semantics></mml:math></inline-formula>) and then uses these terms to pose the optimization problem for style transfer. The output image is synthesized by an optimizer that tries to minimize both loss functions, finding an image that simultaneously matches the content representation and the style representation. In this work, we have adapted the implementation to 1D time-series data, making adjustments on the proposed content loss and style loss functions.</p>
+        <p>One disadvantage of such an approach for optimization relies on obtaining a stylized signal based on a specific input content signal. Indeed, we need to run the whole optimization process with both signals as input, the content, and the style. This approach requires a slow iterative optimization process. Therefore, it is not suited for real-time style transfer, or for a more generalized model that can stylize any given input signal.</p>
+        <sec id="sec4dot2dot1-sensors-20-02605">
+          <title>4.2.1. Content Loss</title>
+          <p>The content loss (<inline-formula><mml:math id="mm7" display="block"><mml:semantics><mml:msub><mml:mi>L</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>o</mml:mi><mml:mi>n</mml:mi><mml:mi>t</mml:mi></mml:mrow></mml:msub></mml:semantics></mml:math></inline-formula>) is based on the mean squared error (MSE) of a given content feature layer (<inline-formula><mml:math id="mm8" display="block"><mml:semantics><mml:msup><mml:mi>F</mml:mi><mml:mi>l</mml:mi></mml:msup></mml:semantics></mml:math></inline-formula>) between the content signal (<inline-formula><mml:math id="mm9" display="block"><mml:semantics><mml:msubsup><mml:mi>F</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>s</mml:mi></mml:mrow><mml:mi>l</mml:mi></mml:msubsup></mml:semantics></mml:math></inline-formula>) and the generated signal (<inline-formula><mml:math id="mm10" display="block"><mml:semantics><mml:msubsup><mml:mi>F</mml:mi><mml:mrow><mml:mi>g</mml:mi><mml:mi>s</mml:mi></mml:mrow><mml:mi>l</mml:mi></mml:msubsup></mml:semantics></mml:math></inline-formula>). The feature layer can be used with the raw data or any other layer from a model used as a feature extractor. In our case, we have used the first convolutional layer from the raw EMG convolutional stack used within our discriminator. The deeper the convolutional layer chosen, the more abstract are the filters, and therefore the less similar the generated signal is to the content waveform. When the generated signal feature layer is identical to the one from the content, the content loss is zero.</p>
+          <p>The content loss can be expressed with the following equation:<disp-formula id="FD2-sensors-20-02605"><label>(2)</label><mml:math id="mm11" display="block"><mml:semantics><mml:mrow><mml:msub><mml:mi>L</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>o</mml:mi><mml:mi>n</mml:mi><mml:mi>t</mml:mi></mml:mrow></mml:msub><mml:mo>=</mml:mo><mml:mfrac><mml:mn>1</mml:mn><mml:mi>n</mml:mi></mml:mfrac><mml:munderover><mml:mo>&#x2211;</mml:mo><mml:mrow><mml:mi>i</mml:mi><mml:mo>=</mml:mo><mml:mn>1</mml:mn></mml:mrow><mml:mi>n</mml:mi></mml:munderover><mml:msup><mml:mrow><mml:mo>(</mml:mo><mml:msubsup><mml:mi>F</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>s</mml:mi></mml:mrow><mml:mi>l</mml:mi></mml:msubsup><mml:mo>&#x2212;</mml:mo><mml:msubsup><mml:mi>F</mml:mi><mml:mrow><mml:mi>g</mml:mi><mml:mi>s</mml:mi></mml:mrow><mml:mi>l</mml:mi></mml:msubsup><mml:mo>)</mml:mo></mml:mrow><mml:mn>2</mml:mn></mml:msup></mml:mrow></mml:semantics></mml:math></disp-formula></p>
+          <p>During the evaluation of the model, we have identified that the competition between the content loss function (<inline-formula><mml:math id="mm12" display="block"><mml:semantics><mml:msub><mml:mi>L</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>o</mml:mi><mml:mi>n</mml:mi><mml:mi>t</mml:mi></mml:mrow></mml:msub></mml:semantics></mml:math></inline-formula>) and the style loss function (<inline-formula><mml:math id="mm13" display="block"><mml:semantics><mml:msub><mml:mi>L</mml:mi><mml:mrow><mml:mi>s</mml:mi><mml:mi>t</mml:mi><mml:mi>y</mml:mi></mml:mrow></mml:msub></mml:semantics></mml:math></inline-formula>) made it impossible for the optimizer to create an output with higher amplitudes of tremor on the static part of the signals, since <inline-formula><mml:math id="mm14" display="block"><mml:semantics><mml:msub><mml:mi>L</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>o</mml:mi><mml:mi>n</mml:mi><mml:mi>t</mml:mi></mml:mrow></mml:msub></mml:semantics></mml:math></inline-formula> tries to keep the amplitudes close to the content signal by the nature of the mean squared error (MSE). Therefore, it was necessary to add a custom &#x201C;EMG content loss function&#x201D; (<inline-formula><mml:math id="mm15" display="block"><mml:semantics><mml:mrow><mml:mi>E</mml:mi><mml:msub><mml:mi>L</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>o</mml:mi><mml:mi>n</mml:mi><mml:mi>t</mml:mi></mml:mrow></mml:msub></mml:mrow></mml:semantics></mml:math></inline-formula>) that applies a mask on top of the content loss to limit its influence only on the dynamic part of the content signal. The EMG mask was configured to increase the importance of the content loss on parts of the signal whose amplitude is higher than a specific threshold value (<inline-formula><mml:math id="mm16" display="block"><mml:semantics><mml:msub><mml:mi>&#x3F5;</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>s</mml:mi></mml:mrow></mml:msub></mml:semantics></mml:math></inline-formula>). Then, for those parts, the difference between the content features from the content signal and the generated signal is multiplied by an amplification factor (<inline-formula><mml:math id="mm17" display="block"><mml:semantics><mml:msub><mml:mi>&#x3B1;</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>s</mml:mi></mml:mrow></mml:msub></mml:semantics></mml:math></inline-formula>), to make sure that, for those critical points, the output will be closed to the content signal. The custom EMG content loss (<inline-formula><mml:math id="mm18" display="block"><mml:semantics><mml:mrow><mml:mi>E</mml:mi><mml:msub><mml:mi>L</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>o</mml:mi><mml:mi>n</mml:mi><mml:mi>t</mml:mi></mml:mrow></mml:msub></mml:mrow></mml:semantics></mml:math></inline-formula>) can be defined according to the following Equation (<xref ref-type="disp-formula" rid="FD3-sensors-20-02605">3</xref>):<disp-formula id="FD3-sensors-20-02605"><label>(3)</label><mml:math id="mm19" display="block"><mml:semantics><mml:mrow><mml:mrow><mml:mi>E</mml:mi><mml:msub><mml:mi>L</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>o</mml:mi><mml:mi>n</mml:mi><mml:mi>t</mml:mi></mml:mrow></mml:msub></mml:mrow><mml:mo>=</mml:mo><mml:mfrac><mml:mn>1</mml:mn><mml:mi>n</mml:mi></mml:mfrac><mml:munderover><mml:mo>&#x2211;</mml:mo><mml:mrow><mml:mi>i</mml:mi><mml:mo>=</mml:mo><mml:mn>1</mml:mn></mml:mrow><mml:mi>n</mml:mi></mml:munderover><mml:mrow><mml:mo stretchy="false">|</mml:mo></mml:mrow><mml:msubsup><mml:mi>F</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>s</mml:mi></mml:mrow><mml:mi>l</mml:mi></mml:msubsup><mml:mo>&#x2212;</mml:mo><mml:msubsup><mml:mi>F</mml:mi><mml:mrow><mml:mi>g</mml:mi><mml:mi>s</mml:mi></mml:mrow><mml:mi>l</mml:mi></mml:msubsup><mml:mrow><mml:mo stretchy="false">|</mml:mo><mml:mo>&#x2217;</mml:mo></mml:mrow><mml:msub><mml:mi>&#x3B1;</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>s</mml:mi></mml:mrow></mml:msub><mml:mo>,</mml:mo><mml:mi>for</mml:mi><mml:mrow><mml:mo>|</mml:mo><mml:msubsup><mml:mi>F</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>s</mml:mi></mml:mrow><mml:mi>l</mml:mi></mml:msubsup><mml:mo>|</mml:mo></mml:mrow><mml:mo>&gt;</mml:mo><mml:msub><mml:mi>&#x3F5;</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>s</mml:mi></mml:mrow></mml:msub></mml:mrow></mml:semantics></mml:math></disp-formula></p>
+        </sec>
+        <sec id="sec4dot2dot2-sensors-20-02605">
+          <title>4.2.2. Style Loss</title>
+          <p>The style loss (<inline-formula><mml:math id="mm20" display="block"><mml:semantics><mml:msub><mml:mi>L</mml:mi><mml:mrow><mml:mi>s</mml:mi><mml:mi>t</mml:mi><mml:mi>y</mml:mi></mml:mrow></mml:msub></mml:semantics></mml:math></inline-formula>) proposed by [<xref ref-type="bibr" rid="B27-sensors-20-02605">27</xref>] is based on multiple feature layers; each feature loss is calculated based on the Euclidean distance between the Gram Matrix for the generated signal and the style signal, multiplied by its specific weight (<inline-formula><mml:math id="mm21" display="block"><mml:semantics><mml:msub><mml:mi>&#x3C9;</mml:mi><mml:mi>l</mml:mi></mml:msub></mml:semantics></mml:math></inline-formula>). The Gram Matrix calculates the vector alignment between each feature by calculating the inner product between the feature map <italic>i</italic> and <italic>j</italic> in layer <italic>l</italic>. The Gram Matrix of a feature set can be expressed as the following:<disp-formula id="FD4-sensors-20-02605"><label>(4)</label><mml:math id="mm22" display="block"><mml:semantics><mml:mrow><mml:msubsup><mml:mi>G</mml:mi><mml:mrow><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi></mml:mrow><mml:mi>l</mml:mi></mml:msubsup><mml:mo>=</mml:mo><mml:munder><mml:mo>&#x2211;</mml:mo><mml:mi>k</mml:mi></mml:munder><mml:msup><mml:mrow><mml:msub><mml:mi>F</mml:mi><mml:mrow><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>k</mml:mi></mml:mrow></mml:msub></mml:mrow><mml:mi>l</mml:mi></mml:msup><mml:msup><mml:mrow><mml:msub><mml:mi>F</mml:mi><mml:mrow><mml:mi>j</mml:mi><mml:mo>,</mml:mo><mml:mi>k</mml:mi></mml:mrow></mml:msub></mml:mrow><mml:mi>l</mml:mi></mml:msup></mml:mrow></mml:semantics></mml:math></disp-formula></p>
+          <p>The loss function for style is significantly similar to our content loss, except that the Mean Squared Error for the Gram-matrices is calculated, instead of the raw tensor outputs from the layers. The overall style loss is the sum of each feature loss divided by the total number of feature layers (<italic>N</italic>) and channels (<italic>M</italic>). Thus, let <italic>s</italic> and <italic>x</italic> be the original style EMG signal and the generated EMG signal, respectively, and <inline-formula><mml:math id="mm23" display="block"><mml:semantics><mml:msub><mml:mi>A</mml:mi><mml:mi>l</mml:mi></mml:msub></mml:semantics></mml:math></inline-formula> and <inline-formula><mml:math id="mm24" display="block"><mml:semantics><mml:msub><mml:mi>G</mml:mi><mml:mi>l</mml:mi></mml:msub></mml:semantics></mml:math></inline-formula> their respective style representations in layer <italic>l</italic>. Thus, the contribution of each layer (<inline-formula><mml:math id="mm25" display="block"><mml:semantics><mml:msub><mml:mi>E</mml:mi><mml:mi>l</mml:mi></mml:msub></mml:semantics></mml:math></inline-formula>) is the following:<disp-formula id="FD5-sensors-20-02605"><label>(5)</label><mml:math id="mm26" display="block"><mml:semantics><mml:mrow><mml:msub><mml:mi>E</mml:mi><mml:mi>l</mml:mi></mml:msub><mml:mo>=</mml:mo><mml:mfrac><mml:mn>1</mml:mn><mml:mrow><mml:mn>4</mml:mn><mml:mo>&#x2217;</mml:mo><mml:msup><mml:mrow><mml:msub><mml:mi>N</mml:mi><mml:mi>l</mml:mi></mml:msub></mml:mrow><mml:mn>2</mml:mn></mml:msup><mml:mo>&#x2217;</mml:mo><mml:msup><mml:mrow><mml:msub><mml:mi>M</mml:mi><mml:mi>l</mml:mi></mml:msub></mml:mrow><mml:mn>2</mml:mn></mml:msup></mml:mrow></mml:mfrac><mml:mo>&#x2217;</mml:mo><mml:munder><mml:mo>&#x2211;</mml:mo><mml:mi>k</mml:mi></mml:munder><mml:msup><mml:mrow><mml:mo>(</mml:mo><mml:msubsup><mml:mi>G</mml:mi><mml:mrow><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi></mml:mrow><mml:mi>l</mml:mi></mml:msubsup><mml:mo>&#x2212;</mml:mo><mml:msubsup><mml:mi>A</mml:mi><mml:mrow><mml:mi>i</mml:mi><mml:mo>,</mml:mo><mml:mi>j</mml:mi></mml:mrow><mml:mi>l</mml:mi></mml:msubsup><mml:mo>)</mml:mo></mml:mrow><mml:mn>2</mml:mn></mml:msup></mml:mrow></mml:semantics></mml:math></disp-formula>
+          and the overall style loss (<inline-formula><mml:math id="mm27" display="block"><mml:semantics><mml:msub><mml:mi>L</mml:mi><mml:mrow><mml:mi>s</mml:mi><mml:mi>t</mml:mi><mml:mi>y</mml:mi></mml:mrow></mml:msub></mml:semantics></mml:math></inline-formula>):<disp-formula id="FD6-sensors-20-02605"><label>(6)</label><mml:math id="mm28" display="block"><mml:semantics><mml:mrow><mml:msub><mml:mi>L</mml:mi><mml:mrow><mml:mi>s</mml:mi><mml:mi>t</mml:mi><mml:mi>y</mml:mi></mml:mrow></mml:msub><mml:mo>=</mml:mo><mml:munderover><mml:mo>&#x2211;</mml:mo><mml:mrow><mml:mi>l</mml:mi><mml:mo>=</mml:mo><mml:mn>0</mml:mn></mml:mrow><mml:mi>L</mml:mi></mml:munderover><mml:msub><mml:mi>&#x3C9;</mml:mi><mml:mi>l</mml:mi></mml:msub><mml:msub><mml:mi>E</mml:mi><mml:mi>l</mml:mi></mml:msub></mml:mrow></mml:semantics></mml:math></disp-formula></p>
+          <p>In this work, we replaced the VGG16 used in [<xref ref-type="bibr" rid="B27-sensors-20-02605">27</xref>] by the trained discriminator network used for the DCGAN architecture. We took the four main discriminator convolutional stacks (raw signal, FFT, FFT over envelopes, and wavelet expansion) as the feature layers for the style loss, calculating the gram matrix for the convolutional filters for the style signal and the generated signal.</p>
+        </sec>
+        <sec id="sec4dot2dot3-sensors-20-02605">
+          <title>4.2.3. Total Loss</title>
+          <p>Finally, the total loss (<inline-formula><mml:math id="mm29" display="block"><mml:semantics><mml:msub><mml:mi>L</mml:mi><mml:mrow><mml:mi>t</mml:mi><mml:mi>o</mml:mi><mml:mi>t</mml:mi><mml:mi>a</mml:mi><mml:mi>l</mml:mi></mml:mrow></mml:msub></mml:semantics></mml:math></inline-formula>) is the sum of the style loss (<inline-formula><mml:math id="mm30" display="block"><mml:semantics><mml:msub><mml:mi>L</mml:mi><mml:mrow><mml:mi>s</mml:mi><mml:mi>t</mml:mi><mml:mi>y</mml:mi></mml:mrow></mml:msub></mml:semantics></mml:math></inline-formula>) and the custom EMG content loss (<inline-formula><mml:math id="mm31" display="block"><mml:semantics><mml:mrow><mml:mi>E</mml:mi><mml:msub><mml:mi>L</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>o</mml:mi><mml:mi>n</mml:mi><mml:mi>t</mml:mi></mml:mrow></mml:msub></mml:mrow></mml:semantics></mml:math></inline-formula>) weighted by their respective weights, (<inline-formula><mml:math id="mm32" display="block"><mml:semantics><mml:msub><mml:mi>&#x3C9;</mml:mi><mml:mrow><mml:mi>s</mml:mi><mml:mi>t</mml:mi><mml:mi>y</mml:mi></mml:mrow></mml:msub></mml:semantics></mml:math></inline-formula>) and (<inline-formula><mml:math id="mm33" display="block"><mml:semantics><mml:msub><mml:mi>&#x3C9;</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>o</mml:mi><mml:mi>n</mml:mi><mml:mi>t</mml:mi></mml:mrow></mml:msub></mml:semantics></mml:math></inline-formula>). We have evaluated different weights effect into the generated style transfer signal:<disp-formula id="FD7-sensors-20-02605"><label>(7)</label><mml:math id="mm34" display="block"><mml:semantics><mml:mrow><mml:msub><mml:mi>L</mml:mi><mml:mrow><mml:mi>t</mml:mi><mml:mi>o</mml:mi><mml:mi>t</mml:mi><mml:mi>a</mml:mi><mml:mi>l</mml:mi></mml:mrow></mml:msub><mml:mo>=</mml:mo><mml:msub><mml:mi>&#x3C9;</mml:mi><mml:mrow><mml:mi>s</mml:mi><mml:mi>t</mml:mi><mml:mi>y</mml:mi></mml:mrow></mml:msub><mml:mo>&#x2217;</mml:mo><mml:msub><mml:mi>L</mml:mi><mml:mrow><mml:mi>s</mml:mi><mml:mi>t</mml:mi><mml:mi>y</mml:mi></mml:mrow></mml:msub><mml:mo>+</mml:mo><mml:msub><mml:mi>&#x3C9;</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>o</mml:mi><mml:mi>n</mml:mi><mml:mi>t</mml:mi></mml:mrow></mml:msub><mml:mo>&#x2217;</mml:mo><mml:mrow><mml:mi>E</mml:mi><mml:msub><mml:mi>L</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>o</mml:mi><mml:mi>n</mml:mi><mml:mi>t</mml:mi></mml:mrow></mml:msub></mml:mrow></mml:mrow></mml:semantics></mml:math></disp-formula></p>
+        </sec>
+        <sec id="sec4dot2dot4-sensors-20-02605">
+          <title>4.2.4. EMG Transformation with Fast Neural Style Transfer</title>
+          <p>Fast neural style transfer [<xref ref-type="bibr" rid="B29-sensors-20-02605">29</xref>] is an enhancement of the Style Transfer architecture that introduces the concept of a transformer network. It is explicitly trained to learn how to translate the content image to a stylized image with a feed-forward network, making the style transfer much faster and easier to apply on input images. It also allows its extension to videos and real-time conversion of frames.</p>
+          <p>In this work, we used the concept of fast neural style transfer to train a transformer network. This network receives an input EMG signal from a healthy individual&#x2014;performing some functional actions (like wrist flexion/extension, grasping, pointing index fingers, and others)&#x2014;and applies a transformation based on a PD patient EMG signal to simulate how the signal would look like if performed by a PD patient. The transformer network is trained based on a set of content examples (healthy individuals database coming from NinaPro) and the style (EMG signals from our private PD patient dataset). For calculating the losses between content, style, and transformed signals, we use the pre-trained discriminator from the DCGAN architecture as a feature extractor&#x2014;thus allowing the transformer network to learn the individual patterns of each patient, according to the trained discriminator and generator.</p>
+          <p>This approach allows us to extend the usage of the discriminator not only to generate additional data for the given protocols (resting tremor) but also to transform existing datasets based on other protocols from healthy patients into a simulated signal as they were generated/performed by the PD&#x2019;s patient.</p>
+          <p>The implementation was based on a Keras fast neural style transfer implementation <uri>https://github.com/misgod/fast-neural-style-keras</uri>, and we have extended the architecture to adapt the ResNet implementation for supporting 1D convolutions. <xref ref-type="fig" rid="sensors-20-02605-f009">Figure 9</xref> details the proposed architecture. The transformer network was adapted from ResNet50 architecture by converting the 2D residual blocks to 1D residual blocks, including deconvolutional layers at the end, for generating an output with similar dimensions to the input.</p>
+          <p>We have also customized the implementation of the content loss and style loss, according to the architecture described in <xref ref-type="sec" rid="sec4-sensors-20-02605">Section 4</xref>, and re-used the pre-processing routines for EMG data. For training the transformer network, we also take a randomly sampled 20,000-point window from PD EMG dataset (reference style) and a randomly sampled batch of 20,000-point windows from the NinaPro dataset.</p>
+          <p>Since the baseline implementation does not support L-BFGS (which is what the original authors used), we have used Adam optimizer. Since Adam is a first-order optimizer, this has required more hyperparameter tuning to get better results. However, creating a generic transformer network that can effectively include the style signal, and adapting it to the input content signal is a much more complex task than running an optimization function for two individual signals. Therefore, the results obtained from the style transfer are better than those from the fast neural style transfer. The same effects noticed on the first approach related to the selection of weights and features can also be extended to the fast neural style transfer.</p>
+        </sec>
+      </sec>
+      <sec id="sec4dot3-sensors-20-02605">
+        <title>4.3. Proposed Metrics</title>
+        <p>To evaluate the performance of the DCGAN and the style transfer techniques, it is important to define a group of metrics that can effectively measure the generated signal similarity to the real signals. According to Xu et al. (2018) [<xref ref-type="bibr" rid="B30-sensors-20-02605">30</xref>], several metrics are defined for GANs, like Inception Score ([<xref ref-type="bibr" rid="B26-sensors-20-02605">26</xref>]), Mode Score ([<xref ref-type="bibr" rid="B31-sensors-20-02605">31</xref>]), Kernel MMD ([<xref ref-type="bibr" rid="B32-sensors-20-02605">32</xref>]), Wasserstein distance, Fr&#xE9;chet Inception Distance (FID) ([<xref ref-type="bibr" rid="B33-sensors-20-02605">33</xref>]), and many others. However, each of those metrics has benefits and disadvantages, and are usually best suited for image generators.</p>
+        <p>For evaluating the generation of time-series data, Delaney et al. (2019) [<xref ref-type="bibr" rid="B34-sensors-20-02605">34</xref>] proposed the use of Dynamic Time Warping (DTW) and Maximum Mean Discrepancy (MMD). In this work, the authors show that both metrics can successfully evaluate the quality of the generated data, with DTW being the preferred metric since it is more robust against training instability and sensitivity to the relative amplitude between the real and synthetic data.</p>
+        <p>For style transfer, Yeh et al. (2019) [<xref ref-type="bibr" rid="B35-sensors-20-02605">35</xref>] proposes a different set of metrics to evaluate how effectively the model transfers the style to the content based on user studies and empirical result evaluation. However, this work focuses on evaluating how good the transfer of shapes and textures between images is, which differs significantly from time-series data approaches.</p>
+        <p>In this work, we propose a set of different metrics for evaluating the result of the DCGAN model and for evaluating the style transfer.</p>
+        <sec id="sec4dot3dot1-sensors-20-02605">
+          <title>4.3.1. Fast Fourier Transform (FFT) Mean Squared Error (MSE)</title>
+          <p>Fourier analysis converts a time function into the frequency domain by decomposing the signal into sinusoidal components and the frequency domain [<xref ref-type="bibr" rid="B36-sensors-20-02605">36</xref>]. Fourier sinusoidal components can be summed to reconstruct the time-domain waveform. Therefore, to measure the similarity between two-time series signals, one can use the mean square error (MSE) between signals FFT magnitudes. The FFT MSE was used for measuring the similarity between generated data and real data and also used to evaluate the similarity between the generated signal and the style and component signals on the style transfer step.</p>
+        </sec>
+        <sec id="sec4dot3dot2-sensors-20-02605">
+          <title>4.3.2. Dynamic Time Warping (DTW)</title>
+          <p>In time series analysis, DTW is one of the algorithms for measuring similarity between two temporal sequences by comparing local cost functions between both sequences. DTW has been applied to temporal sequences of video, audio, and graphics data. Recently, it has been widely used for automatic speech recognition to cope with different speaking speeds. Other applications include speaker recognition [<xref ref-type="bibr" rid="B37-sensors-20-02605">37</xref>] and online signature recognition [<xref ref-type="bibr" rid="B38-sensors-20-02605">38</xref>]. <xref ref-type="fig" rid="sensors-20-02605-f010">Figure 10</xref> depicts a graphical representation of DTW.</p>
+          <p>Due to the large volume of data used as input and output, FastDTW was used to approximate the DTW metric as it reduces the computational time required to calculate DTW to <italic>O(N)</italic>, where <italic>N</italic> is the number of points in the series [<xref ref-type="bibr" rid="B39-sensors-20-02605">39</xref>]. The implementation was obtained from the standard python library (<uri>https://pypi.org/project/fastdtw/</uri>).</p>
+        </sec>
+        <sec id="sec4dot3dot3-sensors-20-02605">
+          <title>4.3.3. EMG Envelope Cross-Correlation</title>
+          <p>Cross-correlation is a measure of similarity of two series as a function of the displacement of one relative to the other. It has been commonly used for applications in pattern recognition, mainly applied to neurophysiology. The cross-correlation function is similar to applying the convolution of two functions [<xref ref-type="bibr" rid="B36-sensors-20-02605">36</xref>]. We have used the normalized cross-correlation, which takes into account also the standard deviation and mean values of the signals, in order to have a better measure of similarity.</p>
+          <p>According to [<xref ref-type="bibr" rid="B40-sensors-20-02605">40</xref>], cross-correlation can be useful for evaluating changes in an individual patient&#x2019;s muscle activation patterns, but not for comparing EMG patterns among different individuals. Therefore, it can be an important measure for evaluating the distance between real data and fake data.</p>
+          <p>Since the shape and values of tremor peaks on EMG might vary a lot from reference and generated signals, we have identified that the simple cross-correlation on raw signals would not capture the similarity between them. Therefore, we have calculated the normalized cross-correlation between the EMG envelopes (with a 100-point moving average on absolute values&#x2014;see <xref ref-type="fig" rid="sensors-20-02605-f007">Figure 7</xref>), in order to check if generated signals correctly captured tremor peaks.</p>
+        </sec>
+        <sec id="sec4dot3dot4-sensors-20-02605">
+          <title>4.3.4. Style Transfer Metrics</title>
+          <p>According to Yeh et al. (2019) [<xref ref-type="bibr" rid="B35-sensors-20-02605">35</xref>], style transfer methods are currently evaluated mostly by visual inspection on a small set of different styles and content image pairs. Such an approach could also be considered for 1D style transfer by visually inspecting the shape of resulting signals. Aiming at a more quantitative analysis over style transfer, Yeh et al. (2019) also introduces two metrics: effectiveness (E), which measures whether transferred images have the desired style; and the coherence (C), which measures the extent to which the original image&#x2019;s content is preserved after the style transfer.</p>
+          <p>Typically, such metrics can be linked to the content loss and style loss functions, when using neural style transfer approach. However, experience shows that generated samples with the same values for style and content loss might show completely different qualitative results when visually inspected. Since proposed metrics such as effectiveness and coherence require user studies for evaluating the quality of the style transfer, and such studies seem unpractical for time series data, we had to propose a different approach based on the two metrics used for the DCGAN generation.</p>
+          <p>According to [<xref ref-type="bibr" rid="B41-sensors-20-02605">41</xref>], it is possible to calculate the DTW of a multi-dimensional time series by calculating first the cross-distance matrix between all dimensions and later applying the DTW distance calculation over the matrix. In this work, we want to evaluate the DTW distance from the generated output from the style transfer process concerning the two original signals, the content, and the style signals. Considering that the content and style signals can be completely independent of each other, we can assume that the best alignment between content and style is the warping function that minimizes the distance between both signals. Therefore, it is the warping function that produces the DTW distance.</p>
+        </sec>
+      </sec>
+    </sec>
+    <sec sec-type="results" id="sec5-sensors-20-02605">
+      <title>5. Results</title>
+      <p>This section describes the results for EMG signal generation based on the two proposed approaches.</p>
+      <sec id="sec5dot1-sensors-20-02605">
+        <title>5.1. EMG Signal Generation with DCGANs</title>
+        <p>The results for the different evaluated models are displayed in <xref ref-type="table" rid="sensors-20-02605-t001">Table 1</xref> and their respective generated signals are shown in <xref ref-type="fig" rid="sensors-20-02605-f011">Figure 11</xref>.</p>
+        <p><xref ref-type="fig" rid="sensors-20-02605-f012">Figure 12</xref> shows the comparison of real samples vs. the generated samples using the proposed EMG-GAN architecture. As we can see, the EMG signals seem quite similar, and, as <xref ref-type="fig" rid="sensors-20-02605-f013">Figure 13</xref> shows, the FFT MSE and the DTW distance are very low, indicating a high similarity on the signals.</p>
+        <p><xref ref-type="fig" rid="sensors-20-02605-f014">Figure 14</xref> shows a comparison of two epochs. Although the quality of the generated signal improves over time, the visual perception of the quality of the generated signal sometimes might decrease. Both metrics DTW and FFT MSE can help to distinguish the quality of the generated signals, showing that, the lower the distance, the better the results. The cross-correlation, however, shows that the latter epoch has a higher correlation, even though the overall quality seems worse. This can happen if the similarity between the EMG tremor peaks is high, increasing the value of the correlation. This fact, isolated, does not mean that the overall quality of the generated signal is better, but it shows that the peaks are captured with higher fidelity.</p>
+        <p><xref ref-type="fig" rid="sensors-20-02605-f015">Figure 15</xref> shows a comparison of generated signals for two different PD&#x2019;s patient datasets. Both models were trained with the same generator and discriminator architectures, with the only difference in the training dataset. As we can see, the models can effectively mimic each patient&#x2019;s unique tremor pattern, showing that the model can effectively capture tremor shape, frequency, and amplitudes. Training the models with a mixed dataset from multiple patients did not give good results since the discriminator has to handle multiple patterns and does not converge.</p>
+        <sec>
+          <title>Mode Collapse and Mini-Batch Discriminator</title>
+          <p>During the development of this work, it was possible to observe that the initially generated samples were quite similar, almost identical to each other, which is a shred of clear evidence that the generator is suffering from mode collapse. To prevent it from happening, we introduced the concept of mini-batch discrimination into the discriminator as an additional pipeline concatenated to the other discriminator components.</p>
+          <p>This additional component forced the generator to produce variations on the resulting samples as it would happen into a regular random batch of real samples. However, this addition also causes some of the examples to be evaluated as fake samples by the discriminator. <xref ref-type="fig" rid="sensors-20-02605-f016">Figure 16</xref> shows the results with and without the mini-batch discrimination component on the discriminator model.</p>
+        </sec>
+      </sec>
+      <sec id="sec5dot2-sensors-20-02605">
+        <title>5.2. EMG Generation Combining Two Signals with Style Transfer</title>
+        <p>In this work, we took a Keras based style transfer implementation as the baseline <uri>https://keras.io/examples/neural_style_transfer/</uri>, and we re-used the pre-processing routines for EMG data and the customization of the content and style loss calculated based on features from our previous trained discriminator model. We take a 20,000 point window (equivalent to 10 s) from both PD EMG dataset (reference style) and from the NinaPro database (reference content). The optimizer used is based on Scipy library implementation of Limited-Memory Broyden&#x2013;Fletcher&#x2013;Goldfarb&#x2013;Shanno algorithm (L-BFGS), a second-order method for optimization that, according to [<xref ref-type="bibr" rid="B27-sensors-20-02605">27</xref>], is more suited for style transfer tasks. The output is initialized with a random vector, and we run the optimizer for 20 epochs (each epoch runs the optimization function 100 times). <xref ref-type="fig" rid="sensors-20-02605-f017">Figure 17</xref> shows the comparison of results for different weights for the content weight and the style weight. It is also possible to initialize the output vector with the original content vector, which provides a faster convergence of the optimizer.</p>
+        <p>According to the selected weight values, we can have a higher level of detail from the style signal on the output signal, including not only the EMG tremor peaks but also the variations within the peaks. If we reduce the weight of the style, the peaks get higher amplitude, but the detailed EMG pattern gets lost on the style transfer. Similar behavior appears with the content weight: the lower the content weight, the lower is the amplitude and similarity of the output signal to the content signal. The higher the content weight, the more visible is the content signal within the output signal.</p>
+        <p>It is also possible to change the feature layers from the discriminator model for style and content features. If we want a higher level of abstraction on the style (fewer details on the time-series), we can select the last convolutional layers as feature layers for the style loss. For the content loss, we are using the raw input signal as a feature since we want to keep the output as close as possible to the content. If we want a higher degree of abstraction also on the content, we can select deeper convolutional layers as features. In this work, we tried to keep the frequency characteristics of the style over the amplitude and keep the shape and amplitude of the content signal. <xref ref-type="fig" rid="sensors-20-02605-f018">Figure 18</xref>a,b present the general metrics, comparing the FFT of the generated signal against the style and content signals.</p>
+      </sec>
+      <sec id="sec5dot3-sensors-20-02605">
+        <title>5.3. EMG Transformation with Fast Neural Style Transfer</title>
+        <p><xref ref-type="fig" rid="sensors-20-02605-f018">Figure 18</xref>d,e shows the FFT comparison of reference samples (content and style) vs. the generated signal with the fast neural style transfer approach. As we can see, the FFT of the combined signal is much closer to the FFT of the style rather than the content FFT. However, by observing <xref ref-type="fig" rid="sensors-20-02605-f018">Figure 18</xref>f, we can clearly see that the shape of the content signal is still present on the resulting signal after the transformation of the content signal by the trained transformer network, showing that this method can also be used for transferring style EMG signals to content EMG signals. The results, however, are worse than those obtained with the typical style transfer based on loss optimization, as we still have a lot of undesired FFT components on the generated signal (comparison between <xref ref-type="fig" rid="sensors-20-02605-f018">Figure 18</xref>a,b and <xref ref-type="fig" rid="sensors-20-02605-f018">Figure 18</xref>d,e).</p>
+      </sec>
+    </sec>
+    <sec sec-type="discussion" id="sec6-sensors-20-02605">
+      <title>6. Discussion</title>
+      <p>During the development of the proposed models for DCGAN, it was possible to validate significant findings when trying to generate 1D complex bio-signals such as EMG tremor signals:<list list-type="order"><list-item><p>General recommendations from [<xref ref-type="bibr" rid="B18-sensors-20-02605">18</xref>] are still valid and useful, such as using stridden convolutions for the discriminator, batch norm in both the generator and the discriminator, and ReLU activation in the generator for all layers except for the output.</p></list-item><list-item><p>While trying to replicate complex output shapes, it is essential to add different convolutional pipelines that focus on specific features from the signal. In our case, adding both FFT analysis and wavelet decomposition to the discriminator model was essential for generating better results.</p></list-item><list-item><p>Using 1D convolutions and adapting all blocks (like residual blocks) gave us better results than trying to use 2D representations of the time-series signals.</p></list-item><list-item><p>We have evaluated different architecture parameters for the Generator model, using a different number of convolutional layers, filters, and different input sizes for the latent space. It was possible to see during experiments that, with a lower and random latent space, the model takes longer to converge, and the generated signal is not as good as expected. By increasing the number of points and by introducing the sampling of the real signal as input, it was possible to generate better results.</p></list-item><list-item><p>Defining metrics that can effectively evaluate the performance of the generator vs. the reference signals are also important and might vary a lot depending on the features that we want to preserve from the original signals. In our case, the FFT and DWT were the best evaluation metrics for raw EMG. Normalized cross-correlation is only able to capture similarity between reference and generated signals if we apply it over the EMG envelopes, since raw EMG data vary too much over peak shapes and amplitudes.</p></list-item><list-item><p>Mini-batch discriminator is vital if we wish to create a generator that can create a wide range of variations on the generated signals. However, this can reduce the stability and convergence of the generator if not configured properly together with other features on the discriminator model.</p></list-item><list-item><p>It was possible to see that the proposed method successfully simulates given input EMG patterns, even when tremor is not well identifiable within the EMG signal, showing great potential for generalization to generate many other types of movement besides tremor patterns. The proposed architecture can be extended by Future work that can explore such potential of proposed models for other types of EMG signal applications.</p></list-item></list></p>
+      <p>For the development of the style transfer, it was essential to find a pre-trained model that can extract crucial style features from the EMG signals. In our case, re-using the discriminator trained on the previous step represented a considerable advantage, and made it possible to transfer the tremor pattern to the content signal effectively. It is also important to evaluate carefully the weights used on the style transfer since different features might affect the output result differently.</p>
+      <p>Future work could extend the results of this work by collecting new datasets from PD&#x2019;s patients performing similar movements like those available on the NinaPro database (e.g., wrist extension, flexion) in order to validate that the style transfer method proposed is really an optimal approximation to real patients&#x2019; movements. This could support finding optimal weights for the content and style and also evaluate better the level of feature abstraction needed to generate a realistic sample. We could also use the proposed methods to assess the differences between primary and secondary PD patients, utilizing the discriminator models to classify both types of disease. Another possibility is to extend the DCGAN architecture for conditional input embedding (C-DCGAN), similar to the approach from [<xref ref-type="bibr" rid="B42-sensors-20-02605">42</xref>], making it possible for the DCGAN model to adapt the generated signal based on the selected patient given as an additional parameter to the generator. To improve even further EMG signal generation, additional features from the input signal could also be explored, like using PCA decomposition or other EMG features to the discriminator model pipeline, to improve the results from the generator model.</p>
+    </sec>
+    <sec sec-type="conclusions" id="sec7-sensors-20-02605">
+      <title>7. Conclusions</title>
+      <p>This paper proposes two new data augmentation methods for EMG signal generation using DCGANs and Style Transfer, creating a reference implementation based on Python. It contributes with three main findings to its field. First, we have shown that the usage of DCGANs with domain-specific discriminator CNN pipelines can successfully simulate EMG tremor behavior, not only mimicking generic tremor patterns but patient and protocol-specific characteristics. Such achievement can support the development of new assisting treatments for reducing tremors on PD patients by extending existing datasets and reducing the necessary time for real patient experiments for capturing data. Second, we have validated that the DTW distance and FFT MSE can be defectively used as a measurement for the evaluation of EMG signal generation. Finally, by utilizing the Style Transfer approach, we were able to successfully transfer tremor patterns for different protocols and datasets, simulating patients tremor on various circumstances and protocols using existing healthy patient datasets. Such results can provide the basis for building Parkinson&#x2019;s disease signal simulators, allowing patients to spend less time on data acquisition experiments, and allowing the generation of more data for supporting further assisting technology development.</p>
+    </sec>
+  </body>
+  <back>
+    <notes>
+      <title>Author Contributions</title>
+      <p>R.A.Z. and E.L.C. conceived and designed the experiments; R.A.Z. performed the experiments; R.A.Z. analyzed the data with support from E.L.C.; R.A.Z. wrote the paper and E.L.C. reviewed and contributed to the paper. All authors have read and agreed to the published version of the manuscript.</p>
+    </notes>
+    <notes>
+      <title>Funding</title>
+      <p>This research received no external funding. The APC was funded by Funda&#xE7;&#xE3;o de Amparo &#xE0; Pesquisa do Estado de S&#xE3;o Paulo (FAPESP #2020/06249-4).</p>
+    </notes>
+    <ack>
+      <title>Acknowledgments</title>
+      <p>We want to acknowledge the collaboration from professor Maria Claudia Ferrari de Castro and the Federal University of Sao Paulo (UNIFESP) for their contribution to this work by providing the PD&#x2019;s EMG dataset used as the basis for our findings.</p>
+    </ack>
+    <notes notes-type="COI-statement">
+      <title>Conflicts of Interest</title>
+      <p>The authors declare no conflict of interests.</p>
+    </notes>
+    <ref-list>
+      <title>References</title>
+      <ref id="B1-sensors-20-02605">
+        <label>1.</label>
+        <element-citation publication-type="book">
+          <person-group person-group-type="author">
+            <collab>World Health Organization</collab>
+          </person-group>
+          <source>Neurological Disorders: Public Health Challenges</source>
+          <publisher-name>World Health Organization</publisher-name>
+          <publisher-loc>Geneva, Switzerland</publisher-loc>
+          <year>2006</year>
+        </element-citation>
+      </ref>
+      <ref id="B2-sensors-20-02605">
+        <label>2.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Petersen</surname>
+              <given-names>E.</given-names>
+            </name>
+            <name>
+              <surname>Rostalski</surname>
+              <given-names>P.</given-names>
+            </name>
+          </person-group>
+          <article-title>A Comprehensive Mathematical Model of Motor Unit Pool Organization, Surface Electromyography, and Force Generation</article-title>
+          <source>Front. Physiol.</source>
+          <year>2019</year>
+          <volume>10</volume>
+          <fpage>176</fpage>
+          <pub-id pub-id-type="doi">10.3389/fphys.2019.00176</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B3-sensors-20-02605">
+        <label>3.</label>
+        <element-citation publication-type="patent">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Philipson</surname>
+              <given-names>B.J.</given-names>
+            </name>
+          </person-group>
+          <article-title>System and Methods for Emg-Triggered Neuromuscular Electrical Stimulation</article-title>
+          <source>U.S. Patent</source>
+          <patent>2009/0171417A1</patent>
+          <day>2</day>
+          <month>July</month>
+          <year>2009</year>
+        </element-citation>
+      </ref>
+      <ref id="B4-sensors-20-02605">
+        <label>4.</label>
+        <element-citation publication-type="thesis">
+          <person-group person-group-type="author">
+            <name>
+              <surname>B&#xF3;</surname>
+              <given-names>A.P.L.</given-names>
+            </name>
+          </person-group>
+          <article-title>Compensation Active de Tremblements Pathologiques des Membres sup&#xE9;Rieurs via la Stimulation &#xE9;Lectrique Fonctionnelle</article-title>
+          <source>Ph.D. Thesis</source>
+          <publisher-name>Universit&#xE9; Montpellier II</publisher-name>
+          <publisher-loc>Montpellier, France</publisher-loc>
+          <year>2010</year>
+        </element-citation>
+      </ref>
+      <ref id="B5-sensors-20-02605">
+        <label>5.</label>
+        <element-citation publication-type="thesis">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Ahad</surname>
+              <given-names>M.A.</given-names>
+            </name>
+          </person-group>
+          <article-title>Analysis of Simulated Electromyography (EMG) Signals Using Integrated Computer Muscle Model</article-title>
+          <source>Ph.D. Thesis</source>
+          <publisher-name>University of Tennessee</publisher-name>
+          <publisher-loc>Knoxville, TN, USA</publisher-loc>
+          <year>2019</year>
+        </element-citation>
+      </ref>
+      <ref id="B6-sensors-20-02605">
+        <label>6.</label>
+        <element-citation publication-type="confproc">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Mor&#xF3;n</surname>
+              <given-names>J.</given-names>
+            </name>
+            <name>
+              <surname>DiProva</surname>
+              <given-names>T.</given-names>
+            </name>
+            <name>
+              <surname>Cochrane</surname>
+              <given-names>J.R.</given-names>
+            </name>
+            <name>
+              <surname>Ahn</surname>
+              <given-names>I.S.</given-names>
+            </name>
+            <name>
+              <surname>Lu</surname>
+              <given-names>Y.</given-names>
+            </name>
+          </person-group>
+          <article-title>EMG-based hand gesture control system for robotics</article-title>
+          <source>Proceedings of the 2018 IEEE 61st International Midwest Symposium on Circuits and Systems (MWSCAS)</source>
+          <conf-loc>Windsor, ON, Canada</conf-loc>
+          <conf-date>5&#x2013;8 August 2018</conf-date>
+          <fpage>664</fpage>
+          <lpage>667</lpage>
+          <pub-id pub-id-type="doi">10.1109/MWSCAS.2018.8624056</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B7-sensors-20-02605">
+        <label>7.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Kosti&#x107;</surname>
+              <given-names>V.S.</given-names>
+            </name>
+            <name>
+              <surname>Tomi&#x107;</surname>
+              <given-names>A.</given-names>
+            </name>
+            <name>
+              <surname>Je&#x10D;menica-Luki&#x107;</surname>
+              <given-names>M.</given-names>
+            </name>
+          </person-group>
+          <article-title>The Pathophysiology of Fatigue in Parkinson&#x2019;s Disease and its Pragmatic Management</article-title>
+          <source>Mov. Disord. Clin. Pract.</source>
+          <year>2016</year>
+          <volume>3</volume>
+          <fpage>323</fpage>
+          <lpage>330</lpage>
+          <pub-id pub-id-type="doi">10.1002/mdc3.12343</pub-id>
+          <pub-id pub-id-type="pmid">30363584</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B8-sensors-20-02605">
+        <label>8.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Hamilton-Wright</surname>
+              <given-names>A.</given-names>
+            </name>
+            <name>
+              <surname>Stashuk</surname>
+              <given-names>D.W.</given-names>
+            </name>
+          </person-group>
+          <article-title>Physiologically based simulation of clinical EMG signals</article-title>
+          <source>IEEE Trans. Biomed. Eng.</source>
+          <year>2005</year>
+          <volume>52</volume>
+          <fpage>171</fpage>
+          <lpage>183</lpage>
+          <pub-id pub-id-type="doi">10.1109/TBME.2004.840501</pub-id>
+          <pub-id pub-id-type="pmid">15709654</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B9-sensors-20-02605">
+        <label>9.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Guerrero</surname>
+              <given-names>J.A.</given-names>
+            </name>
+            <name>
+              <surname>Mac&#xED;as-D&#xED;az</surname>
+              <given-names>J.E.</given-names>
+            </name>
+          </person-group>
+          <article-title>A package for the computational analysis of complex biophysical signals</article-title>
+          <source>Int. J. Mod. Phys. C</source>
+          <year>2019</year>
+          <volume>30</volume>
+          <fpage>1950005</fpage>
+          <pub-id pub-id-type="doi">10.1142/S0129183119500050</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B10-sensors-20-02605">
+        <label>10.</label>
+        <element-citation publication-type="confproc">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Zanini</surname>
+              <given-names>R.A.</given-names>
+            </name>
+            <name>
+              <surname>Colombini</surname>
+              <given-names>E.L.</given-names>
+            </name>
+            <name>
+              <surname>de Castro</surname>
+              <given-names>M.C.F.</given-names>
+            </name>
+          </person-group>
+          <article-title>Parkinson&#x2019;s Disease EMG Signal Prediction Using Neural Networks</article-title>
+          <source>Proceedings of the 2019 IEEE International Conference on Systems, Man and Cybernetics (SMC)</source>
+          <conf-loc>Bari, Italy</conf-loc>
+          <conf-date>6&#x2013;9 October 2019</conf-date>
+          <fpage>2446</fpage>
+          <lpage>2453</lpage>
+        </element-citation>
+      </ref>
+      <ref id="B11-sensors-20-02605">
+        <label>11.</label>
+        <element-citation publication-type="confproc">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Pinheiro</surname>
+              <given-names>W.C.</given-names>
+            </name>
+            <name>
+              <surname>Bittencourt</surname>
+              <given-names>B.E.</given-names>
+            </name>
+            <name>
+              <surname>Luiz</surname>
+              <given-names>L.B.</given-names>
+            </name>
+            <name>
+              <surname>Marcello</surname>
+              <given-names>L.A.</given-names>
+            </name>
+            <name>
+              <surname>Antonio</surname>
+              <given-names>V.F.</given-names>
+            </name>
+            <name>
+              <surname>de Lira</surname>
+              <given-names>P.H.A.</given-names>
+            </name>
+            <name>
+              <surname>Stolf</surname>
+              <given-names>R.G.</given-names>
+            </name>
+            <name>
+              <surname>Castro</surname>
+              <given-names>M.C.F.</given-names>
+            </name>
+          </person-group>
+          <article-title>Parkinson&#x2019;s Disease Tremor Suppression</article-title>
+          <source>Proceedings of the 10th International Joint Conference on Biomedical Engineering Systems and Technologies (BIOSTEC 2017)</source>
+          <conf-loc>Porto, Portugal</conf-loc>
+          <conf-date>21&#x2013;23 February 2017</conf-date>
+          <fpage>149</fpage>
+          <lpage>155</lpage>
+          <pub-id pub-id-type="doi">10.5220/0006152501490155</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B12-sensors-20-02605">
+        <label>12.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Hughes</surname>
+              <given-names>A.</given-names>
+            </name>
+            <name>
+              <surname>Daniel</surname>
+              <given-names>S.</given-names>
+            </name>
+            <name>
+              <surname>Kilford</surname>
+              <given-names>L.</given-names>
+            </name>
+            <name>
+              <surname>Lees</surname>
+              <given-names>A.</given-names>
+            </name>
+          </person-group>
+          <article-title>Accuracy of clinical diagnosis of idiopathic Parkinson&#x2019;s disease: A clinico-pathological study of 100 cases</article-title>
+          <source>J. Neurol Neurosurg. Psychiatry</source>
+          <year>1992</year>
+          <volume>56</volume>
+          <fpage>938</fpage>
+          <lpage>939</lpage>
+          <pub-id pub-id-type="doi">10.1136/jnnp.55.3.181</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B13-sensors-20-02605">
+        <label>13.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Atzori</surname>
+              <given-names>M.</given-names>
+            </name>
+            <name>
+              <surname>Gijsberts</surname>
+              <given-names>A.</given-names>
+            </name>
+            <name>
+              <surname>Castellini</surname>
+              <given-names>C.</given-names>
+            </name>
+            <name>
+              <surname>Caputo</surname>
+              <given-names>B.</given-names>
+            </name>
+            <name>
+              <surname>Hager</surname>
+              <given-names>A.G.M.</given-names>
+            </name>
+            <name>
+              <surname>Elsig</surname>
+              <given-names>S.</given-names>
+            </name>
+            <name>
+              <surname>Giatsidis</surname>
+              <given-names>G.</given-names>
+            </name>
+            <name>
+              <surname>Bassetto</surname>
+              <given-names>F.</given-names>
+            </name>
+            <name>
+              <surname>M&#xFC;ller</surname>
+              <given-names>H.</given-names>
+            </name>
+          </person-group>
+          <article-title>Electromyography data for non-invasive naturally-controlled robotic hand prostheses</article-title>
+          <source>Sci. Data</source>
+          <year>2014</year>
+          <volume>1</volume>
+          <fpage>140053</fpage>
+          <pub-id pub-id-type="doi">10.1038/sdata.2014.53</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B14-sensors-20-02605">
+        <label>14.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Gijsberts</surname>
+              <given-names>A.</given-names>
+            </name>
+            <name>
+              <surname>Atzori</surname>
+              <given-names>M.</given-names>
+            </name>
+            <name>
+              <surname>Castellini</surname>
+              <given-names>C.</given-names>
+            </name>
+            <name>
+              <surname>M&#xFC;ller</surname>
+              <given-names>H.</given-names>
+            </name>
+            <name>
+              <surname>Caputo</surname>
+              <given-names>B.</given-names>
+            </name>
+          </person-group>
+          <article-title>Movement Error Rate for Evaluation of Machine Learning Methods for sEMG-Based Hand Movement Classification</article-title>
+          <source>IEEE Trans. Neural Syst. Rehabiliation Eng.</source>
+          <year>2014</year>
+          <volume>22</volume>
+          <fpage>735</fpage>
+          <lpage>744</lpage>
+          <pub-id pub-id-type="doi">10.1109/TNSRE.2014.2303394</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B15-sensors-20-02605">
+        <label>15.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Atzori</surname>
+              <given-names>M.</given-names>
+            </name>
+            <name>
+              <surname>Cognolato</surname>
+              <given-names>M.</given-names>
+            </name>
+            <name>
+              <surname>M&#xFC;ller</surname>
+              <given-names>H.</given-names>
+            </name>
+          </person-group>
+          <article-title>Deep Learning with Convolutional Neural Networks Applied to Electromyography Data: A Resource for the Classification of Movements for Prosthetic Hands</article-title>
+          <source>Front. Neurorobot.</source>
+          <year>2016</year>
+          <volume>10</volume>
+          <fpage>9</fpage>
+          <pub-id pub-id-type="doi">10.3389/fnbot.2016.00009</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B16-sensors-20-02605">
+        <label>16.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Goodfellow</surname>
+              <given-names>I.J.</given-names>
+            </name>
+            <name>
+              <surname>Pouget-Abadie</surname>
+              <given-names>J.</given-names>
+            </name>
+            <name>
+              <surname>Mirza</surname>
+              <given-names>M.</given-names>
+            </name>
+            <name>
+              <surname>Xu</surname>
+              <given-names>B.</given-names>
+            </name>
+            <name>
+              <surname>Warde-Farley</surname>
+              <given-names>D.</given-names>
+            </name>
+            <name>
+              <surname>Ozair</surname>
+              <given-names>S.</given-names>
+            </name>
+            <name>
+              <surname>Courville</surname>
+              <given-names>A.C.</given-names>
+            </name>
+            <name>
+              <surname>Bengio</surname>
+              <given-names>Y.</given-names>
+            </name>
+          </person-group>
+          <article-title>Generative Adversarial Networks</article-title>
+          <source>arXiv</source>
+          <year>2014</year>
+          <pub-id pub-id-type="arxiv">1406.2661</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B17-sensors-20-02605">
+        <label>17.</label>
+        <element-citation publication-type="book">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Lucic</surname>
+              <given-names>M.</given-names>
+            </name>
+            <name>
+              <surname>Kurach</surname>
+              <given-names>K.</given-names>
+            </name>
+            <name>
+              <surname>Michalski</surname>
+              <given-names>M.</given-names>
+            </name>
+            <name>
+              <surname>Gelly</surname>
+              <given-names>S.</given-names>
+            </name>
+            <name>
+              <surname>Bousquet</surname>
+              <given-names>O.</given-names>
+            </name>
+          </person-group>
+          <article-title>Are GANs Created Equal? A Large-Scale Study</article-title>
+          <source>Proceedings of the 32nd International Conference on Neural Information Processing Systems (NeurIPS 2018)</source>
+          <person-group person-group-type="editor">
+            <name>
+              <surname>Bengio</surname>
+              <given-names>S.</given-names>
+            </name>
+            <name>
+              <surname>Wallach</surname>
+              <given-names>H.</given-names>
+            </name>
+            <name>
+              <surname>Larochelle</surname>
+              <given-names>H.</given-names>
+            </name>
+            <name>
+              <surname>Grauman</surname>
+              <given-names>K.</given-names>
+            </name>
+            <name>
+              <surname>Cesa-Bianchi</surname>
+              <given-names>N.</given-names>
+            </name>
+            <name>
+              <surname>Garnett</surname>
+              <given-names>R.</given-names>
+            </name>
+          </person-group>
+          <publisher-name>Curran Associates, Inc.</publisher-name>
+          <publisher-loc>Montr&#xE9;al, QC, Canada</publisher-loc>
+          <year>2018</year>
+          <fpage>698</fpage>
+          <lpage>707</lpage>
+        </element-citation>
+      </ref>
+      <ref id="B18-sensors-20-02605">
+        <label>18.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Radford</surname>
+              <given-names>A.</given-names>
+            </name>
+            <name>
+              <surname>Metz</surname>
+              <given-names>L.</given-names>
+            </name>
+            <name>
+              <surname>Chintala</surname>
+              <given-names>S.</given-names>
+            </name>
+          </person-group>
+          <article-title>Unsupervised Representation Learning with Deep Convolutional Generative Adversarial Networks</article-title>
+          <source>arXiv</source>
+          <year>2015</year>
+          <pub-id pub-id-type="arxiv">1511.06434</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B19-sensors-20-02605">
+        <label>19.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Karras</surname>
+              <given-names>T.</given-names>
+            </name>
+            <name>
+              <surname>Aila</surname>
+              <given-names>T.</given-names>
+            </name>
+            <name>
+              <surname>Laine</surname>
+              <given-names>S.</given-names>
+            </name>
+            <name>
+              <surname>Lehtinen</surname>
+              <given-names>J.</given-names>
+            </name>
+          </person-group>
+          <article-title>Progressive Growing of GANs for Improved Quality, Stability, and Variation</article-title>
+          <source>arXiv</source>
+          <year>2017</year>
+          <pub-id pub-id-type="arxiv">1710.10196</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B20-sensors-20-02605">
+        <label>20.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Yang</surname>
+              <given-names>L.C.</given-names>
+            </name>
+            <name>
+              <surname>Chou</surname>
+              <given-names>S.Y.</given-names>
+            </name>
+            <name>
+              <surname>Yang</surname>
+              <given-names>Y.H.</given-names>
+            </name>
+          </person-group>
+          <article-title>MidiNet: A Convolutional Generative Adversarial Network for Symbolic-Domain Music Generation</article-title>
+          <source>arXiv</source>
+          <year>2017</year>
+          <pub-id pub-id-type="arxiv">1703.10847</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B21-sensors-20-02605">
+        <label>21.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Engel</surname>
+              <given-names>J.</given-names>
+            </name>
+            <name>
+              <surname>Agrawal</surname>
+              <given-names>K.K.</given-names>
+            </name>
+            <name>
+              <surname>Chen</surname>
+              <given-names>S.</given-names>
+            </name>
+            <name>
+              <surname>Gulrajani</surname>
+              <given-names>I.</given-names>
+            </name>
+            <name>
+              <surname>Donahue</surname>
+              <given-names>C.</given-names>
+            </name>
+            <name>
+              <surname>Roberts</surname>
+              <given-names>A.</given-names>
+            </name>
+          </person-group>
+          <article-title>GANSynth: Adversarial Neural Audio Synthesis</article-title>
+          <source>arXiv</source>
+          <year>2019</year>
+          <pub-id pub-id-type="arxiv">1902.08710</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B22-sensors-20-02605">
+        <label>22.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Hartmann</surname>
+              <given-names>K.G.</given-names>
+            </name>
+            <name>
+              <surname>Schirrmeister</surname>
+              <given-names>R.T.</given-names>
+            </name>
+            <name>
+              <surname>Ball</surname>
+              <given-names>T.</given-names>
+            </name>
+          </person-group>
+          <article-title>EEG-GAN: Generative adversarial networks for electroencephalograhic (EEG) brain signals</article-title>
+          <source>arXiv</source>
+          <year>2018</year>
+          <pub-id pub-id-type="arxiv">1806.01875</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B23-sensors-20-02605">
+        <label>23.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Zhu</surname>
+              <given-names>F.</given-names>
+            </name>
+            <name>
+              <surname>Ye</surname>
+              <given-names>F.</given-names>
+            </name>
+            <name>
+              <surname>Fu</surname>
+              <given-names>Y.</given-names>
+            </name>
+            <name>
+              <surname>Liu</surname>
+              <given-names>Q.</given-names>
+            </name>
+            <name>
+              <surname>Shen</surname>
+              <given-names>B.</given-names>
+            </name>
+          </person-group>
+          <article-title>Electrocardiogram generation with a bidirectional LSTM-CNN generative adversarial network</article-title>
+          <source>Sci. Rep.</source>
+          <year>2019</year>
+          <volume>9</volume>
+          <fpage>6734</fpage>
+          <pub-id pub-id-type="doi">10.1038/s41598-019-42516-z</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B24-sensors-20-02605">
+        <label>24.</label>
+        <element-citation publication-type="web">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Linder-Nor&#xE9;n</surname>
+              <given-names>E.</given-names>
+            </name>
+          </person-group>
+          <article-title>Keras-GAN</article-title>
+          <year>2017</year>
+          <comment>Available online: <ext-link xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="https://github.com/eriklindernoren/Keras-GAN/tree/master/dcgan" ext-link-type="uri">https://github.com/eriklindernoren/Keras-GAN/tree/master/dcgan</ext-link></comment>
+          <date-in-citation content-type="access-date" iso-8601-date="2019-06-11">(accessed on 11 June 2019)</date-in-citation>
+        </element-citation>
+      </ref>
+      <ref id="B25-sensors-20-02605">
+        <label>25.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Mane</surname>
+              <given-names>S.</given-names>
+            </name>
+            <name>
+              <surname>Kambli</surname>
+              <given-names>R.</given-names>
+            </name>
+            <name>
+              <surname>Kazi</surname>
+              <given-names>F.</given-names>
+            </name>
+            <name>
+              <surname>Singh</surname>
+              <given-names>N.</given-names>
+            </name>
+          </person-group>
+          <article-title>Hand Motion Recognition from Single Channel Surface EMG Using Wavelet &amp; Artificial Neural Network</article-title>
+          <source>Procedia Comput. Sci.</source>
+          <year>2015</year>
+          <volume>49</volume>
+          <fpage>58</fpage>
+          <lpage>65</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.procs.2015.04.227</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B26-sensors-20-02605">
+        <label>26.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Salimans</surname>
+              <given-names>T.</given-names>
+            </name>
+            <name>
+              <surname>Goodfellow</surname>
+              <given-names>I.J.</given-names>
+            </name>
+            <name>
+              <surname>Zaremba</surname>
+              <given-names>W.</given-names>
+            </name>
+            <name>
+              <surname>Cheung</surname>
+              <given-names>V.</given-names>
+            </name>
+            <name>
+              <surname>Radford</surname>
+              <given-names>A.</given-names>
+            </name>
+            <name>
+              <surname>Chen</surname>
+              <given-names>X.</given-names>
+            </name>
+          </person-group>
+          <article-title>Improved Techniques for Training GANs</article-title>
+          <source>arXiv</source>
+          <year>2016</year>
+          <pub-id pub-id-type="arxiv">1606.03498</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B27-sensors-20-02605">
+        <label>27.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Gatys</surname>
+              <given-names>L.A.</given-names>
+            </name>
+            <name>
+              <surname>Ecker</surname>
+              <given-names>A.S.</given-names>
+            </name>
+            <name>
+              <surname>Bethge</surname>
+              <given-names>M.</given-names>
+            </name>
+          </person-group>
+          <article-title>A Neural Algorithm of Artistic Style</article-title>
+          <source>arXiv</source>
+          <year>2015</year>
+          <pub-id pub-id-type="arxiv">1508.06576</pub-id>
+          <pub-id pub-id-type="doi">10.1167/16.12.326</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B28-sensors-20-02605">
+        <label>28.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Simonyan</surname>
+              <given-names>K.</given-names>
+            </name>
+            <name>
+              <surname>Zisserman</surname>
+              <given-names>A.</given-names>
+            </name>
+          </person-group>
+          <article-title>Very Deep Convolutional Networks for Large-Scale Image Recognition</article-title>
+          <source>arXiv</source>
+          <year>2014</year>
+          <pub-id pub-id-type="arxiv">1409.1556</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B29-sensors-20-02605">
+        <label>29.</label>
+        <element-citation publication-type="book">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Johnson</surname>
+              <given-names>J.</given-names>
+            </name>
+            <name>
+              <surname>Alahi</surname>
+              <given-names>A.</given-names>
+            </name>
+            <name>
+              <surname>Fei-Fei</surname>
+              <given-names>L.</given-names>
+            </name>
+          </person-group>
+          <article-title>Perceptual Losses for Real-Time Style Transfer and Super-Resolution</article-title>
+          <source>ECCV</source>
+          <publisher-name>Springer</publisher-name>
+          <publisher-loc>Cham, Switzerland</publisher-loc>
+          <year>2016</year>
+        </element-citation>
+      </ref>
+      <ref id="B30-sensors-20-02605">
+        <label>30.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Xu</surname>
+              <given-names>Q.</given-names>
+            </name>
+            <name>
+              <surname>Huang</surname>
+              <given-names>G.</given-names>
+            </name>
+            <name>
+              <surname>Yuan</surname>
+              <given-names>Y.</given-names>
+            </name>
+            <name>
+              <surname>Guo</surname>
+              <given-names>C.</given-names>
+            </name>
+            <name>
+              <surname>Sun</surname>
+              <given-names>Y.</given-names>
+            </name>
+            <name>
+              <surname>Wu</surname>
+              <given-names>F.</given-names>
+            </name>
+            <name>
+              <surname>Weinberger</surname>
+              <given-names>K.Q.</given-names>
+            </name>
+          </person-group>
+          <article-title>An empirical study on evaluation metrics of generative adversarial networks</article-title>
+          <source>arXiv</source>
+          <year>2018</year>
+          <pub-id pub-id-type="arxiv">1806.07755</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B31-sensors-20-02605">
+        <label>31.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Che</surname>
+              <given-names>T.</given-names>
+            </name>
+            <name>
+              <surname>Li</surname>
+              <given-names>Y.</given-names>
+            </name>
+            <name>
+              <surname>Jacob</surname>
+              <given-names>A.P.</given-names>
+            </name>
+            <name>
+              <surname>Bengio</surname>
+              <given-names>Y.</given-names>
+            </name>
+            <name>
+              <surname>Li</surname>
+              <given-names>W.</given-names>
+            </name>
+          </person-group>
+          <article-title>Mode Regularized Generative Adversarial Networks</article-title>
+          <source>arXiv</source>
+          <year>2016</year>
+          <pub-id pub-id-type="arxiv">1612.02136</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B32-sensors-20-02605">
+        <label>32.</label>
+        <element-citation publication-type="book">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Gretton</surname>
+              <given-names>A.</given-names>
+            </name>
+            <name>
+              <surname>Borgwardt</surname>
+              <given-names>K.M.</given-names>
+            </name>
+            <name>
+              <surname>Rasch</surname>
+              <given-names>M.J.</given-names>
+            </name>
+            <name>
+              <surname>Sch&#xF6;lkopf</surname>
+              <given-names>B.</given-names>
+            </name>
+            <name>
+              <surname>Smola</surname>
+              <given-names>A.J.</given-names>
+            </name>
+          </person-group>
+          <article-title>A Kernel Method for the Two-Sample-Problem</article-title>
+          <source>Advances in Neural Information Processing Systems 19</source>
+          <publisher-name>MIT Press</publisher-name>
+          <publisher-loc>Cambridge, MA, USA</publisher-loc>
+          <year>2007</year>
+          <fpage>513</fpage>
+          <lpage>520</lpage>
+        </element-citation>
+      </ref>
+      <ref id="B33-sensors-20-02605">
+        <label>33.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Heusel</surname>
+              <given-names>M.</given-names>
+            </name>
+            <name>
+              <surname>Ramsauer</surname>
+              <given-names>H.</given-names>
+            </name>
+            <name>
+              <surname>Unterthiner</surname>
+              <given-names>T.</given-names>
+            </name>
+            <name>
+              <surname>Nessler</surname>
+              <given-names>B.</given-names>
+            </name>
+            <name>
+              <surname>Klambauer</surname>
+              <given-names>G.</given-names>
+            </name>
+            <name>
+              <surname>Hochreiter</surname>
+              <given-names>S.</given-names>
+            </name>
+          </person-group>
+          <article-title>GANs Trained by a Two Time-Scale Update Rule Converge to a Nash Equilibrium</article-title>
+          <source>arXiv</source>
+          <year>2017</year>
+          <pub-id pub-id-type="arxiv">1706.08500</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B34-sensors-20-02605">
+        <label>34.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Delaney</surname>
+              <given-names>A.M.</given-names>
+            </name>
+            <name>
+              <surname>Brophy</surname>
+              <given-names>E.</given-names>
+            </name>
+            <name>
+              <surname>Ward</surname>
+              <given-names>T.E.</given-names>
+            </name>
+          </person-group>
+          <article-title>Synthesis of Realistic ECG using Generative Adversarial Networks</article-title>
+          <source>arXiv</source>
+          <year>2019</year>
+          <pub-id pub-id-type="arxiv">1909.09150</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B35-sensors-20-02605">
+        <label>35.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Yeh</surname>
+              <given-names>M.C.</given-names>
+            </name>
+            <name>
+              <surname>Tang</surname>
+              <given-names>S.</given-names>
+            </name>
+            <name>
+              <surname>Bhattad</surname>
+              <given-names>A.</given-names>
+            </name>
+            <name>
+              <surname>Zou</surname>
+              <given-names>C.</given-names>
+            </name>
+            <name>
+              <surname>Forsyth</surname>
+              <given-names>D.</given-names>
+            </name>
+          </person-group>
+          <article-title>Improving Style Transfer with Calibrated Metrics</article-title>
+          <source>arXiv</source>
+          <year>2019</year>
+          <pub-id pub-id-type="arxiv">1910.09447</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B36-sensors-20-02605">
+        <label>36.</label>
+        <element-citation publication-type="book">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Semmlow</surname>
+              <given-names>J.</given-names>
+            </name>
+            <name>
+              <surname>Griffel</surname>
+              <given-names>B.</given-names>
+            </name>
+          </person-group>
+          <source>Biosignal and Medical Image Processing</source>
+          <publisher-name>CRC Press</publisher-name>
+          <publisher-loc>Boca Raton, FL, USA</publisher-loc>
+          <year>2014</year>
+        </element-citation>
+      </ref>
+      <ref id="B37-sensors-20-02605">
+        <label>37.</label>
+        <element-citation publication-type="confproc">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Shahin</surname>
+              <given-names>I.</given-names>
+            </name>
+            <name>
+              <surname>Botros</surname>
+              <given-names>N.</given-names>
+            </name>
+          </person-group>
+          <article-title>Speaker identification using dynamic time warping with stress compensation technique</article-title>
+          <source>Proceedings of the IEEE Southeastcon&#x2019;98 &#x2018;Engineering for a New Era&#x2019;</source>
+          <conf-loc>Orlando, FL, USA</conf-loc>
+          <conf-date>24&#x2013;26 April 1998</conf-date>
+          <fpage>65</fpage>
+          <lpage>68</lpage>
+        </element-citation>
+      </ref>
+      <ref id="B38-sensors-20-02605">
+        <label>38.</label>
+        <element-citation publication-type="confproc">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Miguel-Hurtado</surname>
+              <given-names>O.</given-names>
+            </name>
+            <name>
+              <surname>Mengibar-Pozo</surname>
+              <given-names>L.</given-names>
+            </name>
+            <name>
+              <surname>Lorenz</surname>
+              <given-names>M.G.</given-names>
+            </name>
+            <name>
+              <surname>Liu-Jimenez</surname>
+              <given-names>J.</given-names>
+            </name>
+          </person-group>
+          <article-title>On-Line Signature Verification by Dynamic Time Warping and Gaussian Mixture Models</article-title>
+          <source>Proceedings of the 2007 41st Annual IEEE International Carnahan Conference on Security Technology</source>
+          <conf-loc>Ottawa, ON, Canada</conf-loc>
+          <conf-date>8&#x2013;11 October 2007</conf-date>
+          <fpage>23</fpage>
+          <lpage>29</lpage>
+        </element-citation>
+      </ref>
+      <ref id="B39-sensors-20-02605">
+        <label>39.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Salvador</surname>
+              <given-names>S.</given-names>
+            </name>
+            <name>
+              <surname>Chan</surname>
+              <given-names>P.</given-names>
+            </name>
+          </person-group>
+          <article-title>Toward Accurate Dynamic Time Warping in Linear Time and Space</article-title>
+          <source>Intell. Data Anal.</source>
+          <year>2007</year>
+          <volume>11</volume>
+          <fpage>561</fpage>
+          <lpage>580</lpage>
+          <pub-id pub-id-type="doi">10.3233/IDA-2007-11508</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B40-sensors-20-02605">
+        <label>40.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Wren</surname>
+              <given-names>T.</given-names>
+            </name>
+            <name>
+              <surname>Do</surname>
+              <given-names>K.P.</given-names>
+            </name>
+            <name>
+              <surname>Rethlefsen</surname>
+              <given-names>S.</given-names>
+            </name>
+            <name>
+              <surname>Healy</surname>
+              <given-names>B.</given-names>
+            </name>
+          </person-group>
+          <article-title>Cross-correlation as a method for comparing dynamic electromyography signals during gait</article-title>
+          <source>J. Biomech.</source>
+          <year>2006</year>
+          <volume>39</volume>
+          <fpage>2714</fpage>
+          <lpage>2718</lpage>
+          <pub-id pub-id-type="doi">10.1016/j.jbiomech.2005.09.006</pub-id>
+        </element-citation>
+      </ref>
+      <ref id="B41-sensors-20-02605">
+        <label>41.</label>
+        <element-citation publication-type="book">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Ten Holt</surname>
+              <given-names>G.</given-names>
+            </name>
+            <name>
+              <surname>Reinders</surname>
+              <given-names>M.</given-names>
+            </name>
+            <name>
+              <surname>Hendriks</surname>
+              <given-names>E.</given-names>
+            </name>
+          </person-group>
+          <article-title>Multi-dimensional dynamic time warping for gesture recognition</article-title>
+          <source>ASCI 2007&#x2014;Proceedings of the 13th Annual Conference of the Advanced School for Computing and Imaging</source>
+          <publisher-name>Advanced School for Computing and Imaging (ASCI)</publisher-name>
+          <publisher-loc>Heijen, The Netherlands</publisher-loc>
+          <year>2007</year>
+        </element-citation>
+      </ref>
+      <ref id="B42-sensors-20-02605">
+        <label>42.</label>
+        <element-citation publication-type="journal">
+          <person-group person-group-type="author">
+            <name>
+              <surname>Fu</surname>
+              <given-names>R.</given-names>
+            </name>
+            <name>
+              <surname>Chen</surname>
+              <given-names>J.</given-names>
+            </name>
+            <name>
+              <surname>Zeng</surname>
+              <given-names>S.</given-names>
+            </name>
+            <name>
+              <surname>Zhuang</surname>
+              <given-names>Y.</given-names>
+            </name>
+            <name>
+              <surname>Sudjianto</surname>
+              <given-names>A.</given-names>
+            </name>
+          </person-group>
+          <article-title>Time Series Simulation by Conditional Generative Adversarial Net</article-title>
+          <source>arXiv</source>
+          <year>2019</year>
+          <pub-id pub-id-type="arxiv">1904.11419</pub-id>
+          <pub-id pub-id-type="doi">10.2139/ssrn.3373730</pub-id>
+        </element-citation>
+      </ref>
+    </ref-list>
+    <sec sec-type="display-objects">
+      <title>Figures and Table</title>
+      <fig id="sensors-20-02605-f001" position="float">
+        <label>Figure 1</label>
+        <caption>
+          <p>(<bold>a</bold>) Flexor and (<bold>b</bold>) Extensor EMG signals, acquired with surface EMG sensors attached to the patient&#x2019;s forearm. (<bold>c</bold>) Flexor and (<bold>d</bold>) Extensor EMG signals, after 10-point moving average, re-scaling, and mean subtraction.</p>
+        </caption>
+        <graphic xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sensors-20-02605-g001.tif"/>
+      </fig>
+      <fig id="sensors-20-02605-f002" position="float">
+        <label>Figure 2</label>
+        <caption>
+          <p>(<bold>a</bold>) Figure extracted from [<xref ref-type="bibr" rid="B13-sensors-20-02605">13</xref>] showing the sensor disposition around the forearm. (<bold>b</bold>) Reference signal from NinaPro database 2 for one of eight EMG channels from the Delsys Trigno acquisition system after pre-processing steps.</p>
+        </caption>
+        <graphic xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sensors-20-02605-g002.tif"/>
+      </fig>
+      <fig id="sensors-20-02605-f003" position="float">
+        <label>Figure 3</label>
+        <caption>
+          <p>Proposed flow for the experimental setup.</p>
+        </caption>
+        <graphic xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sensors-20-02605-g003.tif"/>
+      </fig>
+      <fig id="sensors-20-02605-f004" position="float">
+        <label>Figure 4</label>
+        <caption>
+          <p>The proposed DCGAN architecture. Based on 400 points sampled randomly from the real dataset, the generator generates 2000 points that simulate the behavior of real patient tremor. The discriminator tries to distinguish the real data from the generated data, and both networks are updated based on the combined losses from the classification.</p>
+        </caption>
+        <graphic xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sensors-20-02605-g004.tif"/>
+      </fig>
+      <fig id="sensors-20-02605-f005" position="float">
+        <label>Figure 5</label>
+        <caption>
+          <p>Our best proposed DCGAN Generator (<italic>G</italic>) model adaptation to 1D convolutions, taking 400 random samples from the training dataset and applying a sequence of convolutions, up-sampling, and a final dense and moving average layers for improving the generator&#x2019;s performance while generating EMG signals.</p>
+        </caption>
+        <graphic xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sensors-20-02605-g005.tif"/>
+      </fig>
+      <fig id="sensors-20-02605-f006" position="float">
+        <label>Figure 6</label>
+        <caption>
+          <p>Proposed architecture for the DCGAN discriminator. Four features are extracted based on the generated signal (<inline-formula><mml:math id="mm35" display="block"><mml:semantics><mml:mrow><mml:mi>G</mml:mi><mml:mo>(</mml:mo><mml:mi>z</mml:mi><mml:mo>)</mml:mo></mml:mrow></mml:semantics></mml:math></inline-formula>) and are passed through four convolutional layers. * The last convolution is adapted between 32 or 64 filters according to the different features. All filters are flattened and merged, and finally put through a dense layer with sigmoid activation for the output <inline-formula><mml:math id="mm36" display="block"><mml:semantics><mml:mrow><mml:mi>P</mml:mi><mml:mo>(</mml:mo><mml:mi>z</mml:mi><mml:mo>)</mml:mo></mml:mrow></mml:semantics></mml:math></inline-formula>, determining the probability of a sample being a fake or real one. The mini-batch discriminator is also merged to the convolutional filters before the last dense layer is applied.</p>
+        </caption>
+        <graphic xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sensors-20-02605-g006.tif"/>
+      </fig>
+      <fig id="sensors-20-02605-f007" position="float">
+        <label>Figure 7</label>
+        <caption>
+          <p>EMG envelope utilized on the DCGAN discriminator pipeline.</p>
+        </caption>
+        <graphic xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sensors-20-02605-g007.tif"/>
+      </fig>
+      <fig id="sensors-20-02605-f008" position="float">
+        <label>Figure 8</label>
+        <caption>
+          <p>Mini-batch discriminator architecture. Features <inline-formula><mml:math id="mm37" display="block"><mml:semantics><mml:mrow><mml:mi>f</mml:mi><mml:mo>(</mml:mo><mml:msub><mml:mi>x</mml:mi><mml:mi>i</mml:mi></mml:msub><mml:mo>)</mml:mo></mml:mrow></mml:semantics></mml:math></inline-formula> from sample <inline-formula><mml:math id="mm38" display="block"><mml:semantics><mml:msub><mml:mi>x</mml:mi><mml:mi>i</mml:mi></mml:msub></mml:semantics></mml:math></inline-formula> are multiplied through a tensor <bold>T</bold>, generating a matrix <bold><inline-formula><mml:math id="mm39" display="block"><mml:semantics><mml:msub><mml:mi>M</mml:mi><mml:mi>i</mml:mi></mml:msub></mml:semantics></mml:math></inline-formula></bold> for every sample. Cross-sample distance is computed by the L1-distance between the rows of <bold><inline-formula><mml:math id="mm40" display="block"><mml:semantics><mml:msub><mml:mi>M</mml:mi><mml:mi>i</mml:mi></mml:msub></mml:semantics></mml:math></inline-formula></bold> across samples <inline-formula><mml:math id="mm41" display="block"><mml:semantics><mml:mrow><mml:mi>i</mml:mi><mml:mo>&#x2208;</mml:mo><mml:mrow><mml:mn>1</mml:mn><mml:mo>,</mml:mo><mml:mn>2</mml:mn><mml:mo>,</mml:mo><mml:mo>&#x2026;</mml:mo><mml:mo>,</mml:mo><mml:mi>n</mml:mi></mml:mrow></mml:mrow></mml:semantics></mml:math></inline-formula> and apply a negative exponential. The output <bold><inline-formula><mml:math id="mm42" display="block"><mml:semantics><mml:mrow><mml:mi>o</mml:mi><mml:mo>(</mml:mo><mml:msub><mml:mi>x</mml:mi><mml:mi>i</mml:mi></mml:msub><mml:mo>)</mml:mo></mml:mrow></mml:semantics></mml:math></inline-formula></bold> for this mini-batch layer for a sample <bold><inline-formula><mml:math id="mm43" display="block"><mml:semantics><mml:msub><mml:mi>x</mml:mi><mml:mi>i</mml:mi></mml:msub></mml:semantics></mml:math></inline-formula></bold> is the sum of the <inline-formula><mml:math id="mm44" display="block"><mml:semantics><mml:mrow><mml:mi>c</mml:mi><mml:mi>b</mml:mi><mml:mo>(</mml:mo><mml:msub><mml:mi>x</mml:mi><mml:mi>i</mml:mi></mml:msub><mml:mo>,</mml:mo><mml:msub><mml:mi>x</mml:mi><mml:mi>j</mml:mi></mml:msub><mml:mo>)</mml:mo></mml:mrow></mml:semantics></mml:math></inline-formula>&#x2019;s to all other samples&#x2014;Reproduced with permission from [<xref ref-type="bibr" rid="B26-sensors-20-02605">26</xref>].</p>
+        </caption>
+        <graphic xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sensors-20-02605-g008.tif"/>
+      </fig>
+      <fig id="sensors-20-02605-f009" position="float">
+        <label>Figure 9</label>
+        <caption>
+          <p>The proposed Fast Neural Style Transfer architecture. Based on sample data from NinaPro database and a PD&#x2019;s patient EMG data, we train a transformer network that is capable of applying the tremor pattern on any input EMG signal. The discriminator trained during the DCGAN steps was used as a feature extractor for the Style Loss calculation, while the Content Loss was calculated based on MSE from the content signal plus a custom-designed loss for applying penalties where the EMG content signal has higher amplitudes.</p>
+        </caption>
+        <graphic xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sensors-20-02605-g009.tif"/>
+      </fig>
+      <fig id="sensors-20-02605-f010" position="float">
+        <label>Figure 10</label>
+        <caption>
+          <p>Time alignment of two time-dependent sequences using DTW. In this figure, two examples of DTW distances between real sample (upper signal) and generated sample (lower signal) for two distinct epochs: (<bold>a</bold>) Epoch 4800 and (<bold>b</bold>) Epoch 4900.</p>
+        </caption>
+        <graphic xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sensors-20-02605-g010.tif"/>
+      </fig>
+      <fig id="sensors-20-02605-f011" position="float">
+        <label>Figure 11</label>
+        <caption>
+          <p>Resulting generated signals for the different evaluated models. Model details and metrics are described in <xref ref-type="table" rid="sensors-20-02605-t001">Table 1</xref> and on <xref ref-type="sec" rid="sec4dot1dot3-sensors-20-02605">Section 4.1.3</xref>. (<bold>a</bold>) 3CNN-NOISE, resulting EMG signal is too noisy, and the tremor peaks are too wide; (<bold>b</bold>) 3CNN, resulting signal is smoother, but tremor shape is still far from reference signal; (<bold>c</bold>) WAVELET, shows promising results for capturing EMG tremor shape; (<bold>d</bold>) 4CNN, shows great similarity to reference, but presents mode collapse and generate very similar outputs; (<bold>e</bold>) 4CNN-MBD, fix the mode collapse issue, but signal is not so similar to reference; (<bold>f</bold>) 4CNN-MBD-MA, presents our best results, generating EMG signal similar to reference and with a lot of variation on generated samples.</p>
+        </caption>
+        <graphic xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sensors-20-02605-g011.tif"/>
+      </fig>
+      <fig id="sensors-20-02605-f012" position="float">
+        <label>Figure 12</label>
+        <caption>
+          <p>(<bold>a</bold>) reference input signal from PD&#x2019;s EMG dataset; (<bold>b</bold>) generated signal based on the trained generator model after 4800 epochs; (<bold>c</bold>) FFT of the reference signal; (<bold>d</bold>) FFT of the generated signal. It is possible to see that the generated signal captures the main tremor frequencies well (around 5 Hz and its multiples, 10, 15).</p>
+        </caption>
+        <graphic xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sensors-20-02605-g012.tif"/>
+      </fig>
+      <fig id="sensors-20-02605-f013" position="float">
+        <label>Figure 13</label>
+        <caption>
+          <p>(<bold>a</bold>) DTW distance calculated between reference signals and generated signals along epochs; (<bold>b</bold>) FFT MSE calculated between reference signals and generated signals along epochs.</p>
+        </caption>
+        <graphic xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sensors-20-02605-g013.tif"/>
+      </fig>
+      <fig id="sensors-20-02605-f014" position="float">
+        <label>Figure 14</label>
+        <caption>
+          <p>(<bold>a</bold>) Reference and generated signals for epoch 4700; (<bold>b</bold>) Reference and generated signals for epoch 4800. Even though both Generator and Discriminator losses are lower for epoch 4800, the evaluated metrics (FFT and DTW) can correctly evaluate that the first generated signal is more similar to the reference signal.</p>
+        </caption>
+        <graphic xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sensors-20-02605-g014.tif"/>
+      </fig>
+      <fig id="sensors-20-02605-f015" position="float">
+        <label>Figure 15</label>
+        <caption>
+          <p>(<bold>a</bold>) Reference and generated signals for the PD reference patient with proposed DCGAN architecture; (<bold>b</bold>) Reference and generated signals for a different patient dataset.</p>
+        </caption>
+        <graphic xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sensors-20-02605-g015.tif"/>
+      </fig>
+      <fig id="sensors-20-02605-f016" position="float">
+        <label>Figure 16</label>
+        <caption>
+          <p>(<bold>a</bold>) Generated samples without mini-batch discriminator; (<bold>b</bold>) Generated samples with mini-batch discriminator; The results show clearly that the examples are very distinct when the Generator is trained with a mini-batch discriminator component inside the Discriminator. Without such an element, the generated samples tend to converge into a single example (mode collapse), with minimal variations on the signal shape. However, the generator takes longer to converge, and the generator loss is also affected, creating more instability in the training process.</p>
+        </caption>
+        <graphic xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sensors-20-02605-g016.tif"/>
+      </fig>
+      <fig id="sensors-20-02605-f017" position="float">
+        <label>Figure 17</label>
+        <caption>
+          <p>Generated outputs for different values of <inline-formula><mml:math id="mm45" display="block"><mml:semantics><mml:msub><mml:mi>&#x3C9;</mml:mi><mml:mrow><mml:mi>s</mml:mi><mml:mi>t</mml:mi><mml:mi>y</mml:mi></mml:mrow></mml:msub></mml:semantics></mml:math></inline-formula> and <inline-formula><mml:math id="mm46" display="block"><mml:semantics><mml:msub><mml:mi>&#x3C9;</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>o</mml:mi><mml:mi>n</mml:mi><mml:mi>t</mml:mi></mml:mrow></mml:msub></mml:semantics></mml:math></inline-formula>. From left to right, we gradually decrease <inline-formula><mml:math id="mm47" display="block"><mml:semantics><mml:msub><mml:mi>&#x3C9;</mml:mi><mml:mrow><mml:mi>s</mml:mi><mml:mi>t</mml:mi><mml:mi>y</mml:mi></mml:mrow></mml:msub></mml:semantics></mml:math></inline-formula> and increase <inline-formula><mml:math id="mm48" display="block"><mml:semantics><mml:msub><mml:mi>&#x3C9;</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>o</mml:mi><mml:mi>n</mml:mi><mml:mi>t</mml:mi></mml:mrow></mml:msub></mml:semantics></mml:math></inline-formula>, showing the resulting effect on the generated signal. (<bold>a</bold>) <inline-formula><mml:math id="mm49" display="block"><mml:semantics><mml:mrow><mml:msub><mml:mi>&#x3C9;</mml:mi><mml:mrow><mml:mi>s</mml:mi><mml:mi>t</mml:mi><mml:mi>y</mml:mi></mml:mrow></mml:msub><mml:mo>=</mml:mo><mml:mn>5.0</mml:mn></mml:mrow></mml:semantics></mml:math></inline-formula>/<inline-formula><mml:math id="mm50" display="block"><mml:semantics><mml:mrow><mml:msub><mml:mi>&#x3C9;</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>o</mml:mi><mml:mi>n</mml:mi><mml:mi>t</mml:mi></mml:mrow></mml:msub><mml:mo>=</mml:mo><mml:mn>0.1</mml:mn></mml:mrow></mml:semantics></mml:math></inline-formula>; (<bold>b</bold>) <inline-formula><mml:math id="mm51" display="block"><mml:semantics><mml:mrow><mml:msub><mml:mi>&#x3C9;</mml:mi><mml:mrow><mml:mi>s</mml:mi><mml:mi>t</mml:mi><mml:mi>y</mml:mi></mml:mrow></mml:msub><mml:mo>=</mml:mo><mml:mn>4.0</mml:mn></mml:mrow></mml:semantics></mml:math></inline-formula>/<inline-formula><mml:math id="mm52" display="block"><mml:semantics><mml:mrow><mml:msub><mml:mi>&#x3C9;</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>o</mml:mi><mml:mi>n</mml:mi><mml:mi>t</mml:mi></mml:mrow></mml:msub><mml:mo>=</mml:mo><mml:mn>1.0</mml:mn></mml:mrow></mml:semantics></mml:math></inline-formula>; (<bold>c</bold>) <inline-formula><mml:math id="mm53" display="block"><mml:semantics><mml:mrow><mml:msub><mml:mi>&#x3C9;</mml:mi><mml:mrow><mml:mi>s</mml:mi><mml:mi>t</mml:mi><mml:mi>y</mml:mi></mml:mrow></mml:msub><mml:mo>=</mml:mo><mml:mn>2.0</mml:mn></mml:mrow></mml:semantics></mml:math></inline-formula>/<inline-formula><mml:math id="mm54" display="block"><mml:semantics><mml:mrow><mml:msub><mml:mi>&#x3C9;</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>o</mml:mi><mml:mi>n</mml:mi><mml:mi>t</mml:mi></mml:mrow></mml:msub><mml:mo>=</mml:mo><mml:mn>2.0</mml:mn></mml:mrow></mml:semantics></mml:math></inline-formula>; (<bold>d</bold>) <inline-formula><mml:math id="mm55" display="block"><mml:semantics><mml:mrow><mml:msub><mml:mi>&#x3C9;</mml:mi><mml:mrow><mml:mi>s</mml:mi><mml:mi>t</mml:mi><mml:mi>y</mml:mi></mml:mrow></mml:msub><mml:mo>=</mml:mo><mml:mn>1.0</mml:mn></mml:mrow></mml:semantics></mml:math></inline-formula>/<inline-formula><mml:math id="mm56" display="block"><mml:semantics><mml:mrow><mml:msub><mml:mi>&#x3C9;</mml:mi><mml:mrow><mml:mi>c</mml:mi><mml:mi>o</mml:mi><mml:mi>n</mml:mi><mml:mi>t</mml:mi></mml:mrow></mml:msub><mml:mo>=</mml:mo><mml:mn>4.0</mml:mn></mml:mrow></mml:semantics></mml:math></inline-formula>;</p>
+        </caption>
+        <graphic xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sensors-20-02605-g017.tif"/>
+      </fig>
+      <fig id="sensors-20-02605-f018" position="float">
+        <label>Figure 18</label>
+        <caption>
+          <p>(<bold>a</bold>) FFT comparison between generated signal and style signal for style transfer; (<bold>b</bold>) FFT comparison between generated signal and content signal for style transfer. (<bold>c</bold>) As expected, the FFT MSE between generated signal and style decreases over time, while FFT MSE against the content increases over time, since we are using style features to drive the overall tremor frequencies on the style transfer process; (<bold>d</bold>) FFT comparison between generated signal and content signal for fast neural style transfer; (<bold>e</bold>) FFT comparison between generated signal and style signal for fast neural style transfer; (<bold>f</bold>) Generated output based on the fast neural transformer network.</p>
+        </caption>
+        <graphic xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="sensors-20-02605-g018.tif"/>
+      </fig>
+      <table-wrap id="sensors-20-02605-t001" position="float">
+        <object-id pub-id-type="pii">sensors-20-02605-t001_Table 1</object-id>
+        <label>Table 1</label>
+        <caption>
+          <p>Comparison table for highlighted DCGAN architectures. The lower the DTW and FFT MSE metric values, the better is the generated signal. The lower the discriminator loss, the better it is at distinguishing fake from real samples. The lower the generator loss, the better it is at generating fake samples closer to real samples. Model number 6 (4CNN-MBD-MA) shows the best overall results.</p>
+        </caption>
+        <table>
+          <thead>
+            <tr>
+              <th align="center" valign="middle" style="border-bottom:solid thin;border-top:solid thin">#</th>
+              <th align="left" valign="middle" style="border-bottom:solid thin;border-top:solid thin">Model</th>
+              <th align="center" valign="middle" style="border-bottom:solid thin;border-top:solid thin">Latent <break/>Space (z)</th>
+              <th align="center" valign="middle" style="border-bottom:solid thin;border-top:solid thin">Disc.<break/>Loss</th>
+              <th align="center" valign="middle" style="border-bottom:solid thin;border-top:solid thin">Gen.<break/>Loss</th>
+              <th align="center" valign="middle" style="border-bottom:solid thin;border-top:solid thin">DTW</th>
+              <th align="center" valign="middle" style="border-bottom:solid thin;border-top:solid thin">FFT MSE</th>
+              <th align="center" valign="middle" style="border-bottom:solid thin;border-top:solid thin">EMG Envelope<break/>Cross-Correlation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td align="center" valign="middle">
+                <bold>1.</bold>
+              </td>
+              <td align="left" valign="middle">
+                <bold>3CNN-NOISE</bold>
+              </td>
+              <td align="center" valign="middle">Rand (100)</td>
+              <td align="center" valign="middle">0.000002</td>
+              <td align="center" valign="middle">16.118095</td>
+              <td align="center" valign="middle">405.038863</td>
+              <td align="center" valign="middle">130.188808</td>
+              <td align="center" valign="middle">0.373913</td>
+            </tr>
+            <tr>
+              <td align="center" valign="middle">
+                <bold>2.</bold>
+              </td>
+              <td align="left" valign="middle">
+                <bold>3CNN</bold>
+              </td>
+              <td align="center" valign="middle">Sample (400)</td>
+              <td align="center" valign="middle">0.005163</td>
+              <td align="center" valign="middle">3.084711</td>
+              <td align="center" valign="middle">132.185279</td>
+              <td align="center" valign="middle">13.093062</td>
+              <td align="center" valign="middle">0.205428</td>
+            </tr>
+            <tr>
+              <td align="center" valign="middle">
+                <bold>3.</bold>
+              </td>
+              <td align="left" valign="middle">
+                <bold>WAVELET</bold>
+              </td>
+              <td align="center" valign="middle">Sample (400)</td>
+              <td align="center" valign="middle">0.066975</td>
+              <td align="center" valign="middle">2.680009</td>
+              <td align="center" valign="middle">100.145536</td>
+              <td align="center" valign="middle">16.564078</td>
+              <td align="center" valign="middle">0.223018</td>
+            </tr>
+            <tr>
+              <td align="center" valign="middle">
+                <bold>4.</bold>
+              </td>
+              <td align="left" valign="middle">
+                <bold>4CNN</bold>
+              </td>
+              <td align="center" valign="middle">Sample (400)</td>
+              <td align="center" valign="middle">0.035544</td>
+              <td align="center" valign="middle">7.006461</td>
+              <td align="center" valign="middle">93.439412</td>
+              <td align="center" valign="middle">9.675622</td>
+              <td align="center" valign="middle">0.624258</td>
+            </tr>
+            <tr>
+              <td align="center" valign="middle">
+                <bold>5.</bold>
+              </td>
+              <td align="left" valign="middle">
+                <bold>4CNN-MBD</bold>
+              </td>
+              <td align="center" valign="middle">Sample (400)</td>
+              <td align="center" valign="middle">0.000203</td>
+              <td align="center" valign="middle">10.275796</td>
+              <td align="center" valign="middle">100.786512</td>
+              <td align="center" valign="middle">18.916364</td>
+              <td align="center" valign="middle">0.739453</td>
+            </tr>
+            <tr>
+              <td align="center" valign="middle" style="border-bottom:solid thin">
+                <bold>6.</bold>
+              </td>
+              <td align="left" valign="middle" style="border-bottom:solid thin">
+                <bold>4CNN-MBD-MA</bold>
+              </td>
+              <td align="center" valign="middle" style="border-bottom:solid thin">Sample (400)</td>
+              <td align="center" valign="middle" style="border-bottom:solid thin">0.004439</td>
+              <td align="center" valign="middle" style="border-bottom:solid thin">10.636311</td>
+              <td align="center" valign="middle" style="border-bottom:solid thin">98.532786</td>
+              <td align="center" valign="middle" style="border-bottom:solid thin">13.531477</td>
+              <td align="center" valign="middle" style="border-bottom:solid thin">0.791920</td>
+            </tr>
+          </tbody>
+        </table>
+      </table-wrap>
+    </sec>
+  </back>
+</article>
